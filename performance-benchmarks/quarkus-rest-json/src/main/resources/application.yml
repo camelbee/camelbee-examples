@@ -1,0 +1,182 @@
+
+#
+# CamelBee Specific Configurations
+#
+camelbee:
+  # when enabled registers the CamelBee event notifier to the Camel context
+  notifier-enabled: false
+  # when enabled configures stream caching, MDC logging and CamelBeeUnitOfWork for routes
+  route-configurer-enabled: false
+  # when enabled it allows the CamelBe WebGL application to fetch the topology of the Camel Context.
+  context-enabled: false
+  # when enabled intercepts/traces request and responses of all camel components and caches messages.
+  tracer-enabled: false
+  # maximum time the tracer can remain idle before deactivation tracing of messages.
+  tracer-max-idle-time: 60000
+  # maximum collected trace messages
+  tracer-max-messages-count: 10000
+  # when enabled it logs the messages exchanged between endpoints
+  logging-enabled: false
+
+#
+# Quarkus
+#
+quarkus:
+  native:
+    resources:
+      includes:
+        - "openapi/**"
+  vertx:
+    event-loops-pool-size: 8  # Match CPU cores (M1 has 8 perf cores)
+    prefer-native-transport: true  # Use native Netty transport
+    worker-pool-size: 128  # For blocking operations
+  # Register model classes for reflection
+  camel:
+    native:
+      reflection:
+        include-patterns: >
+          com.mycompany.model.api.json.*,
+  devservices:
+    enabled: false
+  banner:
+    enabled: false
+  http:
+    port: 8080
+    accept-backlog: 4096
+    io-threads: 8  # Match event-loops-pool-size
+    limits:
+      max-body-size: 10M
+      max-chunk-size: 8192
+      max-initial-line-length: 4096
+    idle-timeout: 30s
+    read-timeout: 60s
+    cors:
+      enabled: true
+      origins: https://www.camelbee.io,http://localhost:8083
+      methods: GET
+      headers: "*"
+      exposed-headers: Content-Disposition
+      access-control-allow-credentials: true
+      access-control-max-age: 24H
+    worker-threads: 200  # Worker Threads (request processing)
+  test:
+    continuous-testing: "disabled"
+  smallrye-health:
+    root-path: /health
+
+
+
+
+  index-dependency:
+    camelbeecore:
+      group-id: io.camelbee
+      artifact-id: camelbee-quarkus-core
+  jackson:
+    write-dates-as-timestamps: true
+    fail-on-unknown-properties: false
+    serialization-inclusion: non-null
+  micrometer:
+    export:
+      prometheus:
+        path: /metrics
+  log:
+    category:
+      "io.camelbee":
+        level: WARN
+      "org.apache.camel.component.http":
+        level: WARN
+      "org.apache.camel":
+        level: WARN
+    level: WARN
+    console:
+      async: true  # Enable async logging
+      async-overflow: discard  # Don't block on full queue
+    json:
+      fields:
+        timestamp:
+          field-name: "@timestamp"
+        logger-name:
+          field-name: "logger_name"
+        mdc:
+          enabled: true
+          flat-fields: true
+        ndc:
+          enabled: false
+        thread-id:
+          enabled: false
+        hostname:
+          enabled: false
+        sequence:
+          enabled: false
+        process-name:
+          enabled: false
+        process-id:
+          enabled: false
+        logger-class-name:
+          enabled: false
+        thread-name:
+          enabled: false
+
+# Camel
+#
+camel:
+  context:
+    name: quarkus-rest-json
+  threads:
+    virtual:
+      enabled: true
+
+
+
+
+
+
+# TEST
+"%test":
+  quarkus:
+    # Disable JMS/Artemis
+    artemis:
+      enabled: false
+      devservices:
+        enabled: false
+    # Disable JDBC connections
+    datasource:
+      jdbc:
+        enabled: false
+      devservices:
+        enabled: false
+    # Disable Hibernate ORM
+    hibernate-orm:
+      enabled: false
+      database:
+        generation: none
+    # Disable other services
+    redis:
+      devservices:
+        enabled: false
+    kafka:
+      devservices:
+        enabled: false
+    mongodb:
+      devservices:
+        enabled: false
+    camel:
+      routes-discovery:
+        enabled: false
+    http:
+      test-port: 0
+    log:
+      level: DEBUG
+      json:
+        console:
+          enable: false
+
+"%itest":
+  quarkus:
+    http:
+      test-port: 0
+    log:
+      level: DEBUG
+      json:
+        console:
+          enable: false

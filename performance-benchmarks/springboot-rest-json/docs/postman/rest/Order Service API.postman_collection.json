@@ -1,0 +1,2691 @@
+{
+	"info": {
+		"_postman_id": "cb680565-03b9-4d87-bc62-676e4630d752",
+		"name": "Order Service API",
+		"description": "API for managing orders and their items",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13414511"
+	},
+	"item": [
+		{
+			"name": "camelbee-service",
+			"item": [
+				{
+					"name": "orders",
+					"item": [
+						{
+							"name": "batch",
+							"item": [
+								{
+									"name": "Create an orders as batch",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "[\n  {\n    \"orderDate\": \"<date>\",\n    \"id\": \"<string>\",\n    \"salesChannel\": \"<string>\",\n    \"status\": \"Canceled\",\n    \"lastUpdateTimestamp\": \"<dateTime>\",\n    \"items\": [\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      },\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      }\n    ]\n  },\n  {\n    \"orderDate\": \"<date>\",\n    \"id\": \"<string>\",\n    \"salesChannel\": \"<string>\",\n    \"status\": \"Canceled\",\n    \"lastUpdateTimestamp\": \"<dateTime>\",\n    \"items\": [\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      },\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      }\n    ]\n  }\n]",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders/batch",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders",
+												"batch"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Order created",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "[\n  {\n    \"orderDate\": \"<date>\",\n    \"id\": \"<string>\",\n    \"salesChannel\": \"<string>\",\n    \"status\": \"Canceled\",\n    \"lastUpdateTimestamp\": \"<dateTime>\",\n    \"items\": [\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      },\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      }\n    ]\n  },\n  {\n    \"orderDate\": \"<date>\",\n    \"id\": \"<string>\",\n    \"salesChannel\": \"<string>\",\n    \"status\": \"Canceled\",\n    \"lastUpdateTimestamp\": \"<dateTime>\",\n    \"items\": [\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      },\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      }\n    ]\n  }\n]",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/batch",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														"batch"
+													]
+												}
+											},
+											"status": "Created",
+											"code": 201,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "[\n  {\n    \"orderDate\": \"<date>\",\n    \"id\": \"<string>\",\n    \"salesChannel\": \"<string>\",\n    \"status\": \"Canceled\",\n    \"lastUpdateTimestamp\": \"<dateTime>\",\n    \"items\": [\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      },\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      }\n    ]\n  },\n  {\n    \"orderDate\": \"<date>\",\n    \"id\": \"<string>\",\n    \"salesChannel\": \"<string>\",\n    \"status\": \"Canceled\",\n    \"lastUpdateTimestamp\": \"<dateTime>\",\n    \"items\": [\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      },\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      }\n    ]\n  }\n]"
+										},
+										{
+											"name": "Bad Request",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "[\n  {\n    \"orderDate\": \"<date>\",\n    \"id\": \"<string>\",\n    \"salesChannel\": \"<string>\",\n    \"status\": \"Canceled\",\n    \"lastUpdateTimestamp\": \"<dateTime>\",\n    \"items\": [\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      },\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      }\n    ]\n  },\n  {\n    \"orderDate\": \"<date>\",\n    \"id\": \"<string>\",\n    \"salesChannel\": \"<string>\",\n    \"status\": \"Canceled\",\n    \"lastUpdateTimestamp\": \"<dateTime>\",\n    \"items\": [\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      },\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      }\n    ]\n  }\n]",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/batch",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														"batch"
+													]
+												}
+											},
+											"status": "Bad Request",
+											"code": 400,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Internal Server Error",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "[\n  {\n    \"orderDate\": \"<date>\",\n    \"id\": \"<string>\",\n    \"salesChannel\": \"<string>\",\n    \"status\": \"Canceled\",\n    \"lastUpdateTimestamp\": \"<dateTime>\",\n    \"items\": [\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      },\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      }\n    ]\n  },\n  {\n    \"orderDate\": \"<date>\",\n    \"id\": \"<string>\",\n    \"salesChannel\": \"<string>\",\n    \"status\": \"Canceled\",\n    \"lastUpdateTimestamp\": \"<dateTime>\",\n    \"items\": [\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      },\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      }\n    ]\n  }\n]",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/batch",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														"batch"
+													]
+												}
+											},
+											"status": "Internal Server Error",
+											"code": 500,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "Get an order by ID",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<string>",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "An order",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}"
+										},
+										{
+											"name": "Bad Request",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "Bad Request",
+											"code": 400,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Order not found",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "Not Found",
+											"code": 404,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Internal Server Error",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "Internal Server Error",
+											"code": 500,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+										}
+									]
+								},
+								{
+									"name": "Replace an order by ID",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<string>",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Order updated",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}"
+										},
+										{
+											"name": "Bad Request",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "Bad Request",
+											"code": 400,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Order not found",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "Not Found",
+											"code": 404,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Internal Server Error",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "Internal Server Error",
+											"code": 500,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+										}
+									]
+								},
+								{
+									"name": "Update an order by ID",
+									"request": {
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<string>",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Order updated",
+											"originalRequest": {
+												"method": "PATCH",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}"
+										},
+										{
+											"name": "Bad Request",
+											"originalRequest": {
+												"method": "PATCH",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "Bad Request",
+											"code": 400,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Order not found",
+											"originalRequest": {
+												"method": "PATCH",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "Not Found",
+											"code": 404,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Internal Server Error",
+											"originalRequest": {
+												"method": "PATCH",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "Internal Server Error",
+											"code": 500,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+										}
+									]
+								},
+								{
+									"name": "Delete an order by ID",
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<string>",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Order deleted",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "No Content",
+											"code": 204,
+											"_postman_previewlanguage": "text",
+											"header": [
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": ""
+										},
+										{
+											"name": "Bad Request",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "Bad Request",
+											"code": 400,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Order not found",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "Not Found",
+											"code": 404,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Internal Server Error",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "transactionId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "requestId",
+														"value": "<uuid>",
+														"description": "(Required) "
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/camelbee-service/orders/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"camelbee-service",
+														"orders",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "Internal Server Error",
+											"code": 500,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "transactionId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Transaction ID",
+														"type": "text/plain"
+													}
+												},
+												{
+													"key": "requestId",
+													"value": "<uuid>",
+													"description": {
+														"content": "Request ID",
+														"type": "text/plain"
+													}
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "List all orders",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "transactionId",
+										"value": "<uuid>",
+										"description": "(Required) "
+									},
+									{
+										"key": "requestId",
+										"value": "<uuid>",
+										"description": "(Required) "
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/camelbee-service/orders?salesChannel=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"camelbee-service",
+										"orders"
+									],
+									"query": [
+										{
+											"key": "salesChannel",
+											"value": "<string>",
+											"description": "(Required) "
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "A list of orders",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders?salesChannel=<string>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders"
+											],
+											"query": [
+												{
+													"key": "salesChannel",
+													"value": "<string>",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "transactionId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Transaction ID",
+												"type": "text/plain"
+											}
+										},
+										{
+											"key": "requestId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Request ID",
+												"type": "text/plain"
+											}
+										}
+									],
+									"cookie": [],
+									"body": "[\n  {\n    \"orderDate\": \"<date>\",\n    \"id\": \"<string>\",\n    \"salesChannel\": \"<string>\",\n    \"status\": \"Canceled\",\n    \"lastUpdateTimestamp\": \"<dateTime>\",\n    \"items\": [\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      },\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      }\n    ]\n  },\n  {\n    \"orderDate\": \"<date>\",\n    \"id\": \"<string>\",\n    \"salesChannel\": \"<string>\",\n    \"status\": \"Canceled\",\n    \"lastUpdateTimestamp\": \"<dateTime>\",\n    \"items\": [\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      },\n      {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<number>\"\n      }\n    ]\n  }\n]"
+								},
+								{
+									"name": "Bad Request",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders?salesChannel=<string>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders"
+											],
+											"query": [
+												{
+													"key": "salesChannel",
+													"value": "<string>",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "transactionId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Transaction ID",
+												"type": "text/plain"
+											}
+										},
+										{
+											"key": "requestId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Request ID",
+												"type": "text/plain"
+											}
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+								},
+								{
+									"name": "Internal Server Error",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders?salesChannel=<string>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders"
+											],
+											"query": [
+												{
+													"key": "salesChannel",
+													"value": "<string>",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"status": "Internal Server Error",
+									"code": 500,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "transactionId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Transaction ID",
+												"type": "text/plain"
+											}
+										},
+										{
+											"key": "requestId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Request ID",
+												"type": "text/plain"
+											}
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Create an order",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "transactionId",
+										"value": "<uuid>",
+										"description": "(Required) "
+									},
+									{
+										"key": "requestId",
+										"value": "<uuid>",
+										"description": "(Required) "
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"string\",\n  \"salesChannel\": \"string\",\n  \"status\": \"Pending\",\n  \"orderDate\": \"2024-09-21\",\n  \"lastUpdateTimestamp\": \"2024-09-21T06:12:28.719Z\",\n  \"items\": [\n    {\n      \"id\": \"string\",\n      \"name\": \"string\",\n      \"quantity\": 0,\n      \"price\": 0\n    }\n  ]\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/camelbee-service/orders",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"camelbee-service",
+										"orders"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Order created",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"id\": \"12345\",\n  \"salesChannel\": \"Online\",\n  \"status\": \"Pending\",\n  \"orderDate\": \"2024-09-25\",\n  \"lastUpdateTimestamp\": \"2024-09-25T12:00:00Z\",\n  \"items\": [\n    {\n      \"id\": \"item123\",\n      \"name\": \"Product A\",\n      \"quantity\": 2,\n      \"price\": 10.99\n    }\n  ]\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "transactionId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Transaction ID",
+												"type": "text/plain"
+											}
+										},
+										{
+											"key": "requestId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Request ID",
+												"type": "text/plain"
+											}
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}"
+								},
+								{
+									"name": "Bad Request",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "transactionId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Transaction ID",
+												"type": "text/plain"
+											}
+										},
+										{
+											"key": "requestId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Request ID",
+												"type": "text/plain"
+											}
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+								},
+								{
+									"name": "Internal Server Error",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders"
+											]
+										}
+									},
+									"status": "Internal Server Error",
+									"code": 500,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "transactionId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Transaction ID",
+												"type": "text/plain"
+											}
+										},
+										{
+											"key": "requestId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Request ID",
+												"type": "text/plain"
+											}
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Create an order XML",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "transactionId",
+										"value": "<uuid>",
+										"description": "(Required) ",
+										"disabled": true
+									},
+									{
+										"key": "requestId",
+										"value": "<uuid>",
+										"description": "(Required) ",
+										"disabled": true
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml",
+										"description": "application/xml"
+									},
+									{
+										"key": "Accept",
+										"value": "application/xml",
+										"description": "application/xml"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "<Order>\n  <id>string</id>\n  <salesChannel>string</salesChannel>\n  <status>Pending</status>\n  <orderDate>2024-09-21</orderDate>\n  <lastUpdateTimestamp>2024-09-21T06:12:28.719Z</lastUpdateTimestamp>\n  <items>\n    <item>\n      <id>string</id>\n      <name>string</name>\n      <quantity>0</quantity>\n      <price>0</price>\n    </item>\n  </items>\n</Order>\n",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "xml"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/camelbee-service/orders",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"camelbee-service",
+										"orders"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Order created",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/xml"
+											},
+											{
+												"key": "Accept",
+												"value": "application/xml"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Order>\n  <id>12345</id>\n  <salesChannel>Online</salesChannel>\n  <status>Pending</status>\n  <orderDate>2024-09-25</orderDate>\n  <lastUpdateTimestamp>2024-09-25T12:00:00Z</lastUpdateTimestamp>\n  <items>\n    <item>\n      <id>item123</id>\n      <name>Product A</name>\n      <quantity>2</quantity>\n      <price>10.99</price>\n    </item>\n  </items>\n</Order>",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "transactionId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Transaction ID",
+												"type": "text/plain"
+											}
+										},
+										{
+											"key": "requestId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Request ID",
+												"type": "text/plain"
+											}
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}"
+								},
+								{
+									"name": "Bad Request",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "transactionId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Transaction ID",
+												"type": "text/plain"
+											}
+										},
+										{
+											"key": "requestId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Request ID",
+												"type": "text/plain"
+											}
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+								},
+								{
+									"name": "Internal Server Error",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders"
+											]
+										}
+									},
+									"status": "Internal Server Error",
+									"code": 500,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "transactionId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Transaction ID",
+												"type": "text/plain"
+											}
+										},
+										{
+											"key": "requestId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Request ID",
+												"type": "text/plain"
+											}
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Create an order Protobuf",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "transactionId",
+										"value": "<uuid>",
+										"description": "(Required) "
+									},
+									{
+										"key": "requestId",
+										"value": "<uuid>",
+										"description": "(Required) "
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/x-protobuf"
+									},
+									{
+										"key": "Accept",
+										"value": "application/x-protobuf"
+									}
+								],
+								"body": {
+									"mode": "file",
+									"file": {
+										"src": ""
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/camelbee-service/orders",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"camelbee-service",
+										"orders"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Order created",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/x-protobuf",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "application/x-protobuf"
+											}
+										],
+										"body": {
+											"mode": "file",
+											"file": {
+												"src": "postman-cloud:///1ef7c301-c3b5-46a0-ada8-103d01279329"
+											},
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "transactionId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Transaction ID",
+												"type": "text/plain"
+											}
+										},
+										{
+											"key": "requestId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Request ID",
+												"type": "text/plain"
+											}
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}"
+								},
+								{
+									"name": "Bad Request",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "transactionId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Transaction ID",
+												"type": "text/plain"
+											}
+										},
+										{
+											"key": "requestId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Request ID",
+												"type": "text/plain"
+											}
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+								},
+								{
+									"name": "Internal Server Error",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "transactionId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "requestId",
+												"value": "<uuid>",
+												"description": "(Required) "
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"orderDate\": \"<date>\",\n  \"id\": \"<string>\",\n  \"salesChannel\": \"<string>\",\n  \"status\": \"Returned\",\n  \"lastUpdateTimestamp\": \"<dateTime>\",\n  \"items\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<number>\"\n    }\n  ]\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/camelbee-service/orders",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"camelbee-service",
+												"orders"
+											]
+										}
+									},
+									"status": "Internal Server Error",
+									"code": 500,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "transactionId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Transaction ID",
+												"type": "text/plain"
+											}
+										},
+										{
+											"key": "requestId",
+											"value": "<uuid>",
+											"description": {
+												"content": "Request ID",
+												"type": "text/plain"
+											}
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\"\n}"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "/"
+		}
+	]
+}

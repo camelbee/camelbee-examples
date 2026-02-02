@@ -1,0 +1,21 @@
+{
+  "transactionId": "06c78f94-5cdf-42c5-8811-97a9e11c9fd8",
+  "order": {
+    "id": "",
+    "salesChannel": "ONLINE",
+    "status": "PENDING",
+    "items": [{
+      "id": "",
+      "productId": "20-4",
+      "productName": "Product20-4Product20-4Product20-4Product20-4Product20-4Product20-4Product20-4Product20-4Product20-4Product20-4Product20-4Product20-4Product20-4Product20-4Product20-4Product20-4",
+      "quantity": 1,
+      "price": 10.2
+    }, {
+      "id": "",
+      "productId": "20-3",
+      "productName": "Product20-3Product20-3Product20-3Product20-3Product20-3Product20-3Product20-3Product20-3Product20-3Product20-3Product20-3Product20-3Product20-3Product20-3Product20-3Product20-3",
+      "quantity": 2,
+      "price": 15.3
+    }]
+  }
+}

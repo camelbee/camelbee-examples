@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package com.mycompany.order.grpc;
+
+option java_package = "com.mycompany.order.grpc";
+option java_multiple_files = true;
+option java_outer_classname = "OrderServiceOuterClass";
+
+import "google/protobuf/timestamp.proto";
+import "google/type/date.proto";
+import "google/protobuf/empty.proto";
+
+service OrderService {
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+
+
+
+
+
+
+
+}
+
+// ==================== Core Domain Models ====================
+
+message Orders {
+  repeated Order order = 1;
+}
+
+message Order {
+  string id = 1;
+  string salesChannel = 2;
+  string status = 3;
+  google.type.Date orderDate = 4;
+  google.protobuf.Timestamp lastUpdateTimestamp = 5;
+  repeated OrderItem items = 6;
+
+  enum Status {
+    PENDING = 0;
+    CONFIRMED = 1;
+    PROCESSING = 2;
+    SHIPPED = 3;
+    DELIVERED = 4;
+    COMPLETED = 5;
+    CANCELED = 6;
+    RETURNED = 7;
+    FAILED = 8;
+    ON_HOLD = 9;
+  }
+}
+
+message OrderItem {
+  string id = 1;
+  string productId = 2;
+  string productName = 3;
+  int32 quantity = 4;
+  double price = 5;
+}
+
+// ==================== Request Messages ====================
+
+message CreateOrderRequest {
+  string transactionId = 1;
+  Order order = 2;
+}
+
+
+
+
+
+
+
+message CreateOrderResponse {
+  string transactionId = 1;
+  Order order = 2;
+}
+
+
+
+
+

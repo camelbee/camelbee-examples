@@ -1,0 +1,21 @@
+{
+  "transactionId": "7ab64690-c571-488d-ace6-a2abb3a8cf32",
+  "order": {
+    "id": "",
+    "salesChannel": "ONLINE",
+    "status": "PENDING",
+    "items": [{
+      "id": "",
+      "productId": "70-4",
+      "productName": "Product70-4",
+      "quantity": 1,
+      "price": 10.2
+    }, {
+      "id": "",
+      "productId": "70-3",
+      "productName": "Product70-3",
+      "quantity": 2,
+      "price": 15.3
+    }]
+  }
+}

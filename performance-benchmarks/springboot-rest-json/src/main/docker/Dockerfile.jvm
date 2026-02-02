@@ -1,0 +1,29 @@
+FROM eclipse-temurin:21-jdk AS build
+WORKDIR /workspace/app
+
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} application.jar
+RUN java -Djarmode=layertools -jar application.jar extract
+
+FROM eclipse-temurin:21-jre
+
+EXPOSE 8080
+
+ENV TZ="Europe/Amsterdam" \
+  SPRING_PROFILES_ACTIVE="prod"
+
+USER 1001
+
+WORKDIR /workspace/app
+COPY --from=build /workspace/app/dependencies/ ./
+COPY --from=build /workspace/app/spring-boot-loader/ ./
+COPY --from=build /workspace/app/snapshot-dependencies/ ./
+COPY --from=build /workspace/app/application/ ./
+
+#
+# Start  the application
+CMD /opt/java/openjdk/bin/java \
+  ${JAVA_OPTS} \
+  ${EXTRA_JAVA_OPTS} \
+  org.springframework.boot.loader.launch.JarLauncher \
+  com.mycompany.MyCamelbeeServiceApplication

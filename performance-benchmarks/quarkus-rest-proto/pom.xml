@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.camelbee</groupId>
+    <artifactId>camelbee-quarkus-starter</artifactId>
+    <version>2.0.8</version>
+  </parent>
+
+  <artifactId>quarkus-rest-proto</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>quarkus-rest-proto</name>
+  <description>CamelBee mycamelbeeservice API</description>
+
+  <properties>
+    <!-- ... -->
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- ... -->
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-mapstruct</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy-jackson</artifactId>
+    </dependency>
+
+          
+     
+     
+
+          
+    
+        <dependency>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-platform-http</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-rest-openapi</artifactId>
+    </dependency>
+    
+        <dependency>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-http</artifactId>
+    </dependency>
+    
+    
+     
+
+
+
+    
+
+    <dependency>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-protobuf</artifactId>
+    </dependency>
+
+
+
+
+    <!-- Add this dependency -->
+    <dependency>
+      <groupId>com.google.api.grpc</groupId>
+      <artifactId>proto-google-common-protos</artifactId>
+    </dependency>
+
+
+    
+
+
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-logging-json</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+
+
+    <!-- Required for native compilation of jms component -->
+    <dependency>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-reflect</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- Required for native compilation of jwt-->
+    <dependency>
+      <groupId>com.google.crypto.tink</groupId>
+      <artifactId>tink</artifactId>
+    </dependency>
+    <!-- Required for generating gRPC service classes that reference javax annotations -->
+
+
+
+  </dependencies>
+
+  <!-- BUILD: Define specific build plugins here -->
+  <build>
+
+    <extensions>
+      <!-- This is needed if you are using Maven 3.5.0 or later -->
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+      </extension>
+    </extensions>
+
+    <plugins>
+            <!-- OpenApi Generator -->
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>${openapi-generator-maven-plugin.version}</version>
+        <executions>
+                    <!-- Microservice exposes REST api, we need to create camel restconfiguration via rest-openapi and model classes using the order-api.yaml  -->
+          <execution>
+            <id>generate-rest-sources-api</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.directory}/generated-sources/openapi</output>
+              <inputSpec>${project.basedir}/src/main/resources/openapi/order-api.yaml</inputSpec>
+              <generatorName>jaxrs-spec</generatorName>
+              <generateApis>false</generateApis>
+              <modelPackage>com.mycompany.model.api.json</modelPackage>
+              <configOptions>
+                <skipDefaultInterface>true</skipDefaultInterface>
+                <useBeanValidation>true</useBeanValidation>
+                <sourceFolder>src/main/java</sourceFolder>
+                <interfaceOnly>true</interfaceOnly>
+                <singleContentTypes>true</singleContentTypes>
+                <useTags>true</useTags>
+                <oas3>true</oas3>
+                <useSwaggerAnnotations>false</useSwaggerAnnotations>
+                <useJakartaEe>true</useJakartaEe>
+                <dateLibrary>java8</dateLibrary>
+              </configOptions>
+            </configuration>
+          </execution>
+          
+
+                                      </executions>
+      </plugin>
+       
+
+         <!-- Protobuf Maven Plugin -->
+      <!--
+        Using the org.xolstice protobuf-maven-plugin as it is the de-facto standard,
+        widely adopted, and battle-tested in production builds.
+        Chosen over io.github.ascopes as it has broader ecosystem adoption.
+      -->
+      <plugin>
+        <groupId>org.xolstice.maven.plugins</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <version>${protobuf-maven-plugin.version}</version>
+        <configuration>
+          <!-- Protoc compiler -->
+          <protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}</protocArtifact>
+        </configuration>
+
+        <executions>
+          <execution>
+            <id>generate-proto-sources-api</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <protoSourceRoot>${basedir}/src/main/resources/proto</protoSourceRoot>
+              <outputDirectory>${project.build.directory}/generated-sources/proto/api</outputDirectory>
+            </configuration>
+          </execution>
+
+
+
+
+        </executions>
+      </plugin>
+
+
+ 
+ 
+
+
+ 
+
+    </plugins>
+  </build>
+
+  <!-- PROFILES: Define specific profiles here -->
+  <profiles>
+    <!-- ... -->
+  </profiles>
+
+  <!-- REPORTING: Define specific reporting plugins here -->
+  <reporting>
+    <!-- ... -->
+  </reporting>
+
+</project>

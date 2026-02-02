@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <!-- Console Appender for DEFAULT/LOCAL/DEV/TEST -->
+  <springProfile name="default,dev,test,itest">
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder>
+        <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+      </encoder>
+    </appender>
+  </springProfile>
+
+  <!-- Logstash JSON Encoder for PROD -->
+  <springProfile name="prod">
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+        <!-- Custom field names to match Quarkus -->
+        <timestampPattern>yyyy-MM-dd'T'HH:mm:ss.SSSZ</timestampPattern>
+        <fieldNames>
+          <timestamp>@timestamp</timestamp>
+          <logger>logger_name</logger>
+          <message>message</message>
+          <level>level</level>
+        </fieldNames>
+
+        <!-- Include MDC fields (flat format) -->
+        <includeMdcKeyName>tx_request_uri</includeMdcKeyName>
+        <includeMdcKeyName>tx_request_body</includeMdcKeyName>
+        <includeMdcKeyName>tx_request_headers</includeMdcKeyName>
+        <includeMdcKeyName>tx_response_body</includeMdcKeyName>
+        <includeMdcKeyName>tx_response_headers</includeMdcKeyName>
+        <includeMdcKeyName>businessTransactionId</includeMdcKeyName>
+        <includeMdcKeyName>log_type</includeMdcKeyName>
+
+        <!-- Include caller data (like line numbers) -->
+        <includeCallerData>true</includeCallerData>
+
+        <!-- Custom fields -->
+        <customFields>{"app":"camelbee","environment":"production"}</customFields>
+      </encoder>
+    </appender>
+  </springProfile>
+
+  <!-- Package-specific loggers -->
+  <logger name="io.camelbee" level="INFO"/>
+  <logger name="org.apache.camel.component.http" level="INFO"/>
+  <logger name="org.apache.camel" level="INFO"/>
+
+  <!-- Root logger -->
+  <root level="INFO">
+    <appender-ref ref="STDOUT"/>
+  </root>
+
+</configuration>

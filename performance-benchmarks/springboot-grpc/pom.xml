@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.camelbee</groupId>
+    <artifactId>camelbee-springboot-starter</artifactId>
+    <version>2.0.8</version>
+  </parent>
+
+  <artifactId>springboot-grpc</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>springboot-grpc</name>
+  <description>CamelBee mycamelbeeservice API</description>
+
+  <properties>
+    <!-- ... -->
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- ... -->
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.apache.camel.springboot</groupId>
+      <artifactId>camel-mapstruct-starter</artifactId>
+    </dependency>
+
+          
+     
+     
+
+          
+    
+    
+    
+    
+    
+     
+
+
+
+
+
+    <dependency>
+      <groupId>org.apache.camel.springboot</groupId>
+      <artifactId>camel-protobuf-starter</artifactId>
+    </dependency>
+
+
+
+
+
+
+
+    <dependency>
+      <groupId>net.logstash.logback</groupId>
+      <artifactId>logstash-logback-encoder</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.camel.springboot</groupId>
+      <artifactId>camel-grpc-starter</artifactId>
+    </dependency>
+
+    <!-- Required for generating gRPC service classes that reference javax annotations -->
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+    </dependency>
+
+  </dependencies>
+
+  <!-- BUILD: Define specific build plugins here -->
+  <build>
+
+    <extensions>
+      <!-- This is needed if you are using Maven 3.5.0 or later -->
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+      </extension>
+    </extensions>
+
+    <plugins>
+       
+
+         <!-- Protobuf Maven Plugin -->
+      <!--
+        Using the org.xolstice protobuf-maven-plugin as it is the de-facto standard,
+        widely adopted, and battle-tested in production builds.
+        Chosen over io.github.ascopes as it has broader ecosystem adoption.
+      -->
+      <plugin>
+        <groupId>org.xolstice.maven.plugins</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <version>${protobuf-maven-plugin.version}</version>
+        <configuration>
+          <!-- Protoc compiler -->
+          <protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}</protocArtifact>
+          <!-- This is required for gRPC code generation -->
+          <pluginId>grpc-java</pluginId>
+          <pluginArtifact>io.grpc:protoc-gen-grpc-java:${protoc-gen-grpc-java.version}:exe:${os.detected.classifier}</pluginArtifact>
+        </configuration>
+
+        <executions>
+
+
+          <execution>
+            <id>generate-grpc-proto-sources-model</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <protoSourceRoot>${basedir}/src/main/resources/grpc</protoSourceRoot>
+              <outputDirectory>${project.build.directory}/generated-sources/proto/grpc/model</outputDirectory>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>generate-grpc-proto-sources-api</id>
+            <goals>
+              <goal>compile-custom</goal>
+            </goals>
+            <configuration>
+              <protoSourceRoot>${basedir}/src/main/resources/grpc</protoSourceRoot>
+              <outputDirectory>${project.build.directory}/generated-sources/proto/grpc/api</outputDirectory>
+            </configuration>
+          </execution>
+
+
+        </executions>
+      </plugin>
+
+
+ 
+ 
+
+
+ 
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <layers>
+            <enabled>true</enabled>
+          </layers>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <!-- PROFILES: Define specific profiles here -->
+  <profiles>
+    <!-- ... -->
+  </profiles>
+
+  <!-- REPORTING: Define specific reporting plugins here -->
+  <reporting>
+    <!-- ... -->
+  </reporting>
+
+</project>

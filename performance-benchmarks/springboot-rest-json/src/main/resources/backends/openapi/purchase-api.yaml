@@ -1,0 +1,77 @@
+openapi: 3.0.1
+info:
+  title: Purchase Service API
+  description: API for managing purchases and their items
+  version: 1.0.0
+paths:
+components:
+  schemas:
+    Purchase:
+      type: object
+      required:
+        - salesChannel
+        - items
+      properties:
+        id:
+          type: string
+        salesChannel:
+          type: string
+        status:
+          type: string
+          enum:
+            - Pending
+            - Confirmed
+            - Processing
+            - Shipped
+            - Delivered
+            - Completed
+            - Canceled
+            - Returned
+            - Failed
+            - On Hold
+          description: The status of an purchase
+        purchaseDate:
+          type: string
+          description: Date format is ISO-8601 format (yyyy-MM-dd)
+          format: date
+        lastUpdateTimestamp:
+          type: string
+          description: Timestamp in ISO-8601 format (yyyy-MM-ddTHH:mm:ssZ)
+          format: date-time
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PurchaseItem'
+
+    PurchaseItem:
+      type: object
+      required:
+        - productName
+      properties:
+        id:
+          type: string
+        productId:
+          type: string
+        productName:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: number
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+
+    Purchases:
+      type: object
+      description: A wrapper for a list of purchases
+      properties:
+        purchase:
+          type: array
+          items:
+            $ref: '#/components/schemas/Purchase'

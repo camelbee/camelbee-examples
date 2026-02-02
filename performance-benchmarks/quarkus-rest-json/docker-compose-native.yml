@@ -1,0 +1,35 @@
+
+services:
+  # ... dockerized microservice
+  quarkus-rest-json:
+    build:
+      context: .
+      dockerfile: src/main/docker/Dockerfile.native
+    image: camelbee/quarkus-rest-json
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+    environment:
+
+      CAMEL_THREADS_VIRTUAL_ENABLED: "true"
+      QUARKUS_HTTP_HOST: 0.0.0.0
+
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 256M
+        reservations:
+          cpus: '1'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+
+networks:
+  default:
+    name: camelbee_default_network
+    driver: bridge

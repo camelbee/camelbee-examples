@@ -1,0 +1,30 @@
+{
+  "id": null,
+  "salesChannel": "ONLINE",
+  "status": "Pending",
+  "orderDate": "20224-09-21",
+  "lastUpdateTimestamp": null,
+  "items": [
+    {
+      "id": null,
+      "productId": "1001",
+      "productName": "Product1001",
+      "quantity": 1,
+      "price": 20.0
+    },
+    {
+      "id": null,
+      "productId": "1002",
+      "productName": "Product1002",
+      "quantity": 3,
+      "price": 13.5
+    },
+    {
+      "id": null,
+      "productId": "1003",
+      "productName": "Product1003",
+      "quantity": 2,
+      "price": 3.2
+    }
+  ]
+}
