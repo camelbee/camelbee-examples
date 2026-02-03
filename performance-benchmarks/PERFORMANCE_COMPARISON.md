@@ -3,7 +3,7 @@
 This document provides a detailed performance comparison of CamelBee-generated microservices across different runtimes (Spring Boot, Quarkus JVM, Quarkus Native) and protocols (gRPC, REST with Protocol Buffers, REST with JSON).
 
 ## Table of Contents
-
+- [Benchmark Results](#benchmark-results)
 - [Executive Summary](#executive-summary)
 - [Test Environment](#test-environment)
 - [Overall Performance Comparison](#overall-performance-comparison)
@@ -13,6 +13,18 @@ This document provides a detailed performance comparison of CamelBee-generated m
 - [Latency Analysis](#latency-analysis)
 - [Use Case Recommendations](#use-case-recommendations)
 - [Detailed Results](#detailed-results)
+
+## Benchmark Results
+
+![Performance Comparison](benchmark_results.png)
+
+Comprehensive comparison of Apache Camel microservices across:
+- 3 runtimes: Spring Boot, Quarkus JVM, Quarkus Native
+- 3 protocols: gRPC, REST+Protobuf, REST+JSON
+- Realistic workload: POST requests with MapStruct mappings
+
+See individual test results in each project folder.
+
 
 ## Executive Summary
 
@@ -26,23 +38,33 @@ This document provides a detailed performance comparison of CamelBee-generated m
 
 ## Test Environment
 
-### Hardware & Configuration
-- **CPU**: 2 cores allocated (with varying base architectures across tests)
-- **Memory**: 1GB for JVM-based, 256MB for Native
-- **Container**: Docker with resource limits
-- **Test Duration**: 2 minutes per run
-- **Virtual Users**: 200 concurrent connections
-- **Warm-up**: 2-3 runs to ensure JVM optimization
+### Versions
+- **Apache Camel**: 4.16
+- **Quarkus**: 3.30.0
+- **Spring Boot**: 3.5.9
+- **Java**: 21
 
-### Test Tool
-- **k6**: Industry-standard load testing tool
+### Infrastructure
+- **Platform**: Local Docker containers
+- **Hardware**: MacBook Pro M1
+- **CPU**: 2 cores per container
+- **Memory**: 1GB (JVM runtimes) / 256MB (Native)
+- **Container**: Docker with resource limits
+
+### Load Testing
+- **Tool**: k6 (industry-standard load testing tool)
+- **Virtual Users**: 200 concurrent
+- **Test Duration**: 2 minutes per run
+- **Warm-up**: 2-3 runs for JVM optimization
+- **Request Type**: POST with MapStruct mappings
 - **Metrics**: Throughput, latency (avg, median, P90, P95, max), resource usage
 
 ### Configuration
 All tests performed with:
-- All CamelBee interceptors disabled for maximum performance
+- All Apache Camel interceptors disabled for maximum performance
 - Mock backend (no external dependencies)
 - Optimized Docker resource allocation
+- Production-like settings
 
 ## Overall Performance Comparison
 
@@ -80,6 +102,7 @@ All tests performed with:
 #### Total Network I/O Comparison (3 Test Runs Combined)
 
 **gRPC:**
+
 | Runtime | Data Received | Data Sent | Total |
 |---------|---------------|-----------|-------|
 | Spring Boot | 2.52 GB | 2.20 GB | 4.72 GB |
@@ -87,6 +110,7 @@ All tests performed with:
 | Quarkus Native | 1.59 GB | 1.42 GB | 3.01 GB |
 
 **REST + Protobuf:**
+
 | Runtime | Data Received | Data Sent | Total |
 |---------|---------------|-----------|-------|
 | Spring Boot | 1.81 GB | 1.98 GB | 3.79 GB |
@@ -94,6 +118,7 @@ All tests performed with:
 | Quarkus Native | 1.63 GB | 1.57 GB | 3.20 GB |
 
 **REST + JSON:**
+
 | Runtime | Data Received | Data Sent | Total |
 |---------|---------------|-----------|-------|
 | Spring Boot | 2.78 GB | 4.01 GB | 6.79 GB |

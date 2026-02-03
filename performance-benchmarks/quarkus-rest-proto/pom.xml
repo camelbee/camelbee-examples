@@ -39,13 +39,8 @@
       <artifactId>quarkus-resteasy-jackson</artifactId>
     </dependency>
 
-          
-     
-     
 
-          
-    
-        <dependency>
+    <dependency>
       <groupId>org.apache.camel.quarkus</groupId>
       <artifactId>camel-quarkus-platform-http</artifactId>
     </dependency>
@@ -54,18 +49,12 @@
       <groupId>org.apache.camel.quarkus</groupId>
       <artifactId>camel-quarkus-rest-openapi</artifactId>
     </dependency>
-    
-        <dependency>
+
+    <dependency>
       <groupId>org.apache.camel.quarkus</groupId>
       <artifactId>camel-quarkus-http</artifactId>
     </dependency>
-    
-    
-     
 
-
-
-    
 
     <dependency>
       <groupId>org.apache.camel.quarkus</groupId>
@@ -73,16 +62,11 @@
     </dependency>
 
 
-
-
     <!-- Add this dependency -->
     <dependency>
       <groupId>com.google.api.grpc</groupId>
       <artifactId>proto-google-common-protos</artifactId>
     </dependency>
-
-
-    
 
 
     <dependency>
@@ -95,7 +79,6 @@
       <artifactId>awaitility</artifactId>
       <scope>test</scope>
     </dependency>
-
 
 
     <!-- Required for native compilation of jms component -->
@@ -113,7 +96,6 @@
     <!-- Required for generating gRPC service classes that reference javax annotations -->
 
 
-
   </dependencies>
 
   <!-- BUILD: Define specific build plugins here -->
@@ -128,13 +110,13 @@
     </extensions>
 
     <plugins>
-            <!-- OpenApi Generator -->
+      <!-- OpenApi Generator -->
       <plugin>
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
         <version>${openapi-generator-maven-plugin.version}</version>
         <executions>
-                    <!-- Microservice exposes REST api, we need to create camel restconfiguration via rest-openapi and model classes using the order-api.yaml  -->
+          <!-- Microservice exposes REST api, we need to create camel restconfiguration via rest-openapi and model classes using the order-api.yaml  -->
           <execution>
             <id>generate-rest-sources-api</id>
             <goals>
@@ -160,13 +142,13 @@
               </configOptions>
             </configuration>
           </execution>
-          
 
-                                      </executions>
+
+        </executions>
       </plugin>
-       
 
-         <!-- Protobuf Maven Plugin -->
+
+      <!-- Protobuf Maven Plugin -->
       <!--
         Using the org.xolstice protobuf-maven-plugin as it is the de-facto standard,
         widely adopted, and battle-tested in production builds.
@@ -194,17 +176,9 @@
           </execution>
 
 
-
-
         </executions>
       </plugin>
 
-
- 
- 
-
-
- 
 
     </plugins>
   </build>

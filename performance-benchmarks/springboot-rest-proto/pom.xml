@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -34,13 +34,8 @@
       <artifactId>camel-mapstruct-starter</artifactId>
     </dependency>
 
-          
-     
-     
 
-          
-    
-        <dependency>
+    <dependency>
       <groupId>org.apache.camel.springboot</groupId>
       <artifactId>camel-platform-http-starter</artifactId>
     </dependency>
@@ -49,22 +44,16 @@
       <groupId>org.apache.camel.springboot</groupId>
       <artifactId>camel-rest-openapi-starter</artifactId>
     </dependency>
-    
-        <dependency>
+
+    <dependency>
       <groupId>org.apache.camel.springboot</groupId>
       <artifactId>camel-http-starter</artifactId>
     </dependency>
-    
-        <dependency>
+
+    <dependency>
       <groupId>io.swagger.core.v3</groupId>
       <artifactId>swagger-annotations-jakarta</artifactId>
     </dependency>
-    
-    
-     
-
-
-
 
 
     <dependency>
@@ -77,9 +66,6 @@
       <groupId>com.google.api.grpc</groupId>
       <artifactId>proto-google-common-protos</artifactId>
     </dependency>
-
-
-
 
 
     <dependency>
@@ -102,13 +88,13 @@
     </extensions>
 
     <plugins>
-            <!-- OpenApi Generator -->
+      <!-- OpenApi Generator -->
       <plugin>
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
         <version>${openapi-generator-maven-plugin.version}</version>
         <executions>
-                    <!-- Microservice exposes REST api, we need to create camel restconfiguration via rest-openapi and model classes using the order-api.yaml  -->
+          <!-- Microservice exposes REST api, we need to create camel restconfiguration via rest-openapi and model classes using the order-api.yaml  -->
           <execution>
             <id>generate-rest-sources-api</id>
             <goals>
@@ -133,13 +119,13 @@
               </configOptions>
             </configuration>
           </execution>
-          
-          
-                                      </executions>
-      </plugin>
-       
 
-         <!-- Protobuf Maven Plugin -->
+
+        </executions>
+      </plugin>
+
+
+      <!-- Protobuf Maven Plugin -->
       <!--
         Using the org.xolstice protobuf-maven-plugin as it is the de-facto standard,
         widely adopted, and battle-tested in production builds.
@@ -167,17 +153,10 @@
           </execution>
 
 
-
-
         </executions>
       </plugin>
 
 
- 
- 
-
-
- 
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>

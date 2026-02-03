@@ -39,31 +39,11 @@
       <artifactId>quarkus-resteasy-jackson</artifactId>
     </dependency>
 
-          
-     
-     
-
-          
-    
-    
-    
-    
-     
-
-
-
-    
 
     <dependency>
       <groupId>org.apache.camel.quarkus</groupId>
       <artifactId>camel-quarkus-protobuf</artifactId>
     </dependency>
-
-
-
-
-
-    
 
 
     <dependency>
@@ -104,7 +84,6 @@
     <!-- Required for generating gRPC service classes that reference javax annotations -->
 
 
-
   </dependencies>
 
   <!-- BUILD: Define specific build plugins here -->
@@ -119,9 +98,9 @@
     </extensions>
 
     <plugins>
-       
 
-         <!-- Protobuf Maven Plugin -->
+
+      <!-- Protobuf Maven Plugin -->
       <!--
         Using the org.xolstice protobuf-maven-plugin as it is the de-facto standard,
         widely adopted, and battle-tested in production builds.
@@ -168,12 +147,6 @@
         </executions>
       </plugin>
 
-
- 
- 
-
-
- 
 
     </plugins>
   </build>
