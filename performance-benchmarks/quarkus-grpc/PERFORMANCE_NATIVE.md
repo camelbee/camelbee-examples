@@ -106,7 +106,7 @@ Duration: 2m01.6s
 
 **Screenshot of the result:**
 
-![img_4.png](img_4.png)
+![img_4.png](docs/images/img_4.png)
 
 ---
 
@@ -131,7 +131,7 @@ Duration: 2m01.8s
 
 **Screenshot of the result:**
 
-![img_5.png](img_5.png)
+![img_5.png](docs/images/img_5.png)
 
 ---
 
@@ -156,7 +156,7 @@ Duration: 2m01.9s
 
 **Screenshot of the result:**
 
-![img_6.png](img_6.png)
+![img_6.png](docs/images/img_6.png)
 
 ---
 
@@ -197,7 +197,7 @@ The CPU graph shows three clear spikes corresponding to each test run, demonstra
 
 **Screenshot of Docker container statistics:**
 
-![img_7.png](img_7.png)
+![img_7.png](docs/images/img_7.png)
 
 ## Recommendations
 
