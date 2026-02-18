@@ -58,10 +58,59 @@
       <artifactId>camel-mapstruct-starter</artifactId>
     </dependency>
 
-
+    <!-- ====================================================================
+         CHANGED: WebFlux (Netty) instead of WebMVC (Jetty/Servlet)
+         This gives us a reactive, non-blocking HTTP stack comparable to
+         Quarkus Vert.x/Netty for fair benchmarking.
+         ==================================================================== -->
     <dependency>
       <groupId>org.springframework.ai</groupId>
-      <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
+      <artifactId>spring-ai-starter-mcp-server-webflux</artifactId>
+    </dependency>
+
+    <!-- ====================================================================
+         OVERRIDE: Neutralize the servlet-based web starter from parent POM.
+         spring-boot-starter-web (with Jetty) comes from camelbee-springboot-starter.
+         We exclude spring-webmvc so WebFlux takes priority.
+         We keep spring-web (shared by both MVC and WebFlux) but remove the
+         servlet-specific MVC module.
+         ==================================================================== -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-webmvc</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!-- ====================================================================
+         OVERRIDE: Neutralize Jetty from parent POM.
+         Setting scope to 'provided' keeps it off the runtime classpath.
+         Netty (from spring-boot-starter-webflux) becomes the HTTP server.
+         ==================================================================== -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jetty</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-tomcat</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- ====================================================================
+         ADDED: WebFlux starter — brings Reactor Netty as the HTTP server.
+         ==================================================================== -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webflux</artifactId>
     </dependency>
 
     <dependency>
@@ -74,18 +123,15 @@
       <artifactId>swagger-annotations-jakarta</artifactId>
     </dependency>
 
-
     <dependency>
       <groupId>net.logstash.logback</groupId>
       <artifactId>logstash-logback-encoder</artifactId>
     </dependency>
 
-
   </dependencies>
 
   <!-- BUILD: Define specific build plugins here -->
   <build>
-
 
     <plugins>
       <!-- OpenApi Generator -->
@@ -122,7 +168,6 @@
 
         </executions>
       </plugin>
-
 
       <plugin>
         <groupId>org.springframework.boot</groupId>

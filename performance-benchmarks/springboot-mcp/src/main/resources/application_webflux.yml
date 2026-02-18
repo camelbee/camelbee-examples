@@ -20,7 +20,8 @@ camelbee:
 
 server:
   port: 8080
-
+  reactive:
+    server-factory: netty
 
 #
 # Spring
@@ -28,6 +29,7 @@ server:
 spring:
   main:
     allow-bean-definition-overriding: true
+    web-application-type: reactive
   application:
     name: myservice
   ai:

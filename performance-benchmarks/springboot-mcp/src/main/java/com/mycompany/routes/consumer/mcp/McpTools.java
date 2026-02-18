@@ -1,5 +1,6 @@
 package com.mycompany.routes.consumer.mcp;
 
+import com.mycompany.mapper.api.McpOrderMapper;
 import com.mycompany.model.api.mcp.Order;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Service;
 public class McpTools {
 
   private final FluentProducerTemplate fluentProducerTemplate;
-  //private final McpOrderMapper mcpOrderMapper;
+  private final McpOrderMapper mcpOrderMapper;
   // =========================================================================
   // CREATE ORDER
   // =========================================================================
@@ -48,11 +49,11 @@ public class McpTools {
     // Expected: Fastest response times across all 3 platforms.
     //           Quarkus Native should shine here with lowest memory + cold start.
     // =============================================================================
-    Order response = new Order();
-    response.setId("1");
-    response.setSalesChannel(order.getSalesChannel());
-    response.setItems(order.getItems());
-    return response;
+    //    Order response = new Order();
+    //    response.setId("1");
+    //    response.setSalesChannel(order.getSalesChannel());
+    //    response.setItems(order.getItems());
+    //    return response;
 
     // =============================================================================
     // TEST 2 — MCP Tool + MapStruct (object mapping layer added)
@@ -70,8 +71,8 @@ public class McpTools {
     //           at compile time (no reflection). Native image impact should be low,
     //           but watch for GraalVM pruning MapStruct-generated classes.
     // =============================================================================
-//    com.mycompany.model.domain.Order domainOrder = mcpOrderMapper.mcpToDomainOrder(order);
-//    return mcpOrderMapper.domainToMcpOrder(domainOrder);
+    com.mycompany.model.domain.Order domainOrder = mcpOrderMapper.mcpToDomainOrder(order);
+    return mcpOrderMapper.domainToMcpOrder(domainOrder);
 
     // =============================================================================
     // TEST 3 — MCP Tool + MapStruct + Apache Camel (full production stack)
@@ -93,18 +94,18 @@ public class McpTools {
     //           generated microservice performance — the most meaningful benchmark.
     //           Quarkus Native should still outperform JVM on cold start + memory.
     // =============================================================================
-//
-//    var result = fluentProducerTemplate
-//        .to("direct:mcpCreateOrder")
-//        .withHeader("transactionId", transactionId)
-//        .withBody(order)
-//        .send();
-//
-//    if (result.getMessage().getBody() instanceof Exception) {
-//      throw result.getMessage().getBody(Exception.class);
-//    } else {
-//      return result.getMessage().getBody(Order.class);
-//    }
+
+    //  var result = fluentProducerTemplate
+    //      .to("direct:mcpCreateOrder")
+    //      .withHeader("transactionId", transactionId)
+    //      .withBody(order)
+    //      .send();
+    //
+    //  if (result.getMessage().getBody() instanceof Exception) {
+    //    throw result.getMessage().getBody(Exception.class);
+    //  } else {
+    //    return result.getMessage().getBody(Order.class);
+    //  }
   }
 
 }

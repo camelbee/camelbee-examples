@@ -59,11 +59,11 @@ public class McpTools {
     // Expected: Fastest response times across all 3 platforms.
     //           Quarkus Native should shine here with lowest memory + cold start.
     // =============================================================================
-    //    Order response = new Order();
-    //    response.setId("1");
-    //    response.setSalesChannel(order.getSalesChannel());
-    //    response.setItems(order.getItems());
-    //    return response;
+        Order response = new Order();
+        response.setId("1");
+        response.setSalesChannel(order.getSalesChannel());
+        response.setItems(order.getItems());
+        return response;
 
     // =============================================================================
     // TEST 2 — MCP Tool + MapStruct (object mapping layer added)
@@ -105,17 +105,17 @@ public class McpTools {
     //           generated microservice performance — the most meaningful benchmark.
     //           Quarkus Native should still outperform JVM on cold start + memory.
     // =============================================================================
-    var result = fluentProducerTemplate
-        .to("direct:mcpCreateOrder")
-        .withHeader("transactionId", transactionId)
-        .withBody(order)
-        .send();
-
-    if (result.getMessage().getBody() instanceof ToolCallException) {
-      throw result.getMessage().getBody(ToolCallException.class);
-    } else {
-      return result.getMessage().getBody(Order.class);
-    }
+    //    var result = fluentProducerTemplate
+    //        .to("direct:mcpCreateOrder")
+    //        .withHeader("transactionId", transactionId)
+    //        .withBody(order)
+    //        .send();
+    //
+    //    if (result.getMessage().getBody() instanceof ToolCallException) {
+    //      throw result.getMessage().getBody(ToolCallException.class);
+    //    } else {
+    //      return result.getMessage().getBody(Order.class);
+    //    }
   }
 
 }
