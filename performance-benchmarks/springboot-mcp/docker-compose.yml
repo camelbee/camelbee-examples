@@ -1,0 +1,45 @@
+
+services:
+  # ... dockerized microservice
+  springboot-mcp:
+    build:
+      context: .
+      dockerfile: src/main/docker/Dockerfile.jvm
+    image: camelbee/springboot-mcp
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+    environment:
+      # Spring Profile
+      SPRING_PROFILES_ACTIVE: prod
+
+      JAVA_OPTS: >
+        -XshowSettings:vm
+        -XX:MetaspaceSize=120m
+        -XX:MaxMetaspaceSize=192m
+        -XX:InitialRAMPercentage=70
+        -XX:MaxRAMPercentage=70
+        -XX:MinRAMPercentage=70
+        -XX:+UseG1GC
+        -XX:MaxGCPauseMillis=200
+        -XX:+UseStringDeduplication
+        -Dcamel.threads.virtual.enabled=true
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '1'
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+
+networks:
+  default:
+    name: camelbee_default_network
+    driver: bridge
