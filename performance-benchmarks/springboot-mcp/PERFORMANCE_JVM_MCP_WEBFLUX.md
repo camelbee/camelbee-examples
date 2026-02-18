@@ -7,7 +7,7 @@ This document outlines the configuration, setup, and performance test results fo
 The microservice was created using the [CamelBee Initializer](https://www.camelbee.io) with the following configuration:
 
 - **Interface**: MCP (Model Context Protocol)
-- **Runtime**: Spring Boot
+- **Runtime**: Spring Boot WebFlux
 - **Backend**: MOCK (no external dependencies)
 
 After generating and downloading the microservice from CamelBee, apply the following configurations for optimal performance testing.
