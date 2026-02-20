@@ -36,6 +36,33 @@ camelbee:
   logging-enabled: false
 ```
 
+
+> **Note**: The `McpTools.java` class contains three test configurations. For this test, **Test 3 (MCP Tool + MapStruct + Apache Camel)** is active — the MCP tool call goes through a MapStruct DTO mapping (`mcpToDomainOrder` → `domainToMcpOrder`) and is routed through Apache Camel. Tests 1 and 2 are commented out.
+
+```java 
+@McpTool(name = "createOrder", description = "Create a new order with customer details, product information, and shipping preferences")
+Order createOrder(
+@McpToolParam(description = "Order object containing salesChannel, items with productName, quantity, and price") Order order,
+@McpToolParam(description = "Client-generated correlation ID for distributed tracing and logging", required = false) String transactionId,
+@McpToolParam(description = "Business process correlation ID for end-to-end transaction tracing across systems",
+required = false) String businessTransactionId
+) throws Exception {
+
+      var result = fluentProducerTemplate
+          .to("direct:mcpCreateOrder")
+          .withHeader("transactionId", transactionId)
+          .withBody(order)
+          .send();
+
+      if (result.getMessage().getBody() instanceof Exception) {
+        throw result.getMessage().getBody(Exception.class);
+      } else {
+        return result.getMessage().getBody(Order.class);
+      }
+
+}
+```
+
 ### Docker Compose Configuration
 
 Update the CPU allocation in `docker-compose.yml` to **2 cores** for optimal performance:
@@ -96,38 +123,38 @@ k6 run mcp-throughput-test.js
      ✓ is valid JSON-RPC
      ✓ has result
 
-     checks.........................: 100.00% ✓ 1780114     ✗ 0     
-     data_received..................: 898 MB  7.4 MB/s
-     data_sent......................: 805 MB  6.6 MB/s
-     dropped_iterations.............: 24086   198.34178/s
-     http_req_blocked...............: avg=10.29µs   min=0s    med=1µs     max=58.09ms  p(90)=1µs     p(95)=2µs     
-     http_req_connecting............: avg=9.08µs    min=0s    med=0s      max=58.07ms  p(90)=0s      p(95)=0s      
-   ✓ http_req_duration..............: avg=39.45ms   min=341µs med=18.36ms max=3.1s     p(90)=88.54ms p(95)=101.63ms
-       { expected_response:true }...: avg=39.45ms   min=341µs med=18.36ms max=3.1s     p(90)=88.54ms p(95)=101.63ms
-     http_req_failed................: 0.00%   ✓ 0           ✗ 597314
-     http_req_receiving.............: avg=526.91µs  min=4µs   med=8µs     max=986.83ms p(90)=68µs    p(95)=860µs   
-     http_req_sending...............: avg=36.66µs   min=1µs   med=4µs     max=48.07ms  p(90)=10µs    p(95)=17µs    
-     http_req_tls_handshaking.......: avg=0s        min=0s    med=0s      max=0s       p(90)=0s      p(95)=0s      
-     http_req_waiting...............: avg=38.89ms   min=302µs med=17.96ms max=3.1s     p(90)=87.94ms p(95)=101.05ms
-     http_reqs......................: 597314  4918.721332/s
-     iteration_duration.............: avg=4.09s     min=1.39s med=2.91s   max=26.72s   p(90)=7.17s   p(95)=12.29s  
-     iterations.....................: 5914    48.700211/s
-     request_latency................: avg=40.410413 min=0     med=19      max=3109     p(90)=90      p(95)=102     
-     requests_received..............: 591400  4870.021121/s
-     requests_sent..................: 591400  4870.021121/s
-     vus............................: 109     min=109       max=200 
+     checks.........................: 100.00% ✓ 2306563     ✗ 0     
+     data_received..................: 1.1 GB  9.2 MB/s
+     data_sent......................: 1.0 GB  8.6 MB/s
+     dropped_iterations.............: 22337   184.154965/s
+     http_req_blocked...............: avg=12.77µs  min=0s    med=1µs     max=92.58ms  p(90)=1µs     p(95)=2µs    
+     http_req_connecting............: avg=10.72µs  min=0s    med=0s      max=88.59ms  p(90)=0s      p(95)=0s     
+   ✓ http_req_duration..............: avg=29.99ms  min=330µs med=15.28ms max=4.28s    p(90)=69.25ms p(95)=92.11ms
+       { expected_response:true }...: avg=29.99ms  min=330µs med=15.28ms max=4.28s    p(90)=69.25ms p(95)=92.11ms
+     http_req_failed................: 0.00%   ✓ 0           ✗ 773963
+     http_req_receiving.............: avg=299.67µs min=3µs   med=7µs     max=998.51ms p(90)=34µs    p(95)=125µs  
+     http_req_sending...............: avg=38.64µs  min=1µs   med=3µs     max=46.57ms  p(90)=9µs     p(95)=16µs   
+     http_req_tls_handshaking.......: avg=0s       min=0s    med=0s      max=0s       p(90)=0s      p(95)=0s     
+     http_req_waiting...............: avg=29.66ms  min=310µs med=15.13ms max=4.28s    p(90)=68.83ms p(95)=91.7ms 
+     http_reqs......................: 773963  6380.853688/s
+     iteration_duration.............: avg=3.15s    min=1.2s  med=2.43s   max=21.51s   p(90)=4.41s   p(95)=8.61s  
+     iterations.....................: 7663    63.176769/s
+     request_latency................: avg=31.04988 min=0     med=16      max=1997     p(90)=71      p(95)=93     
+     requests_received..............: 766300  6317.676919/s
+     requests_sent..................: 766300  6317.676919/s
+     vus............................: 87      min=87        max=200 
      vus_max........................: 200     min=200       max=200 
 
 
-running (2m01.4s), 000/200 VUs, 5914 complete and 0 interrupted iterations
-throughput_test ✓ [======================================] 200 VUs  2m0s  05914/30000 iters, 150 per VU
+running (2m01.3s), 000/200 VUs, 7663 complete and 0 interrupted iterations
+throughput_test ✓ [======================================] 200 VUs  2m0s  07663/30000 iters, 150 per VU
 ```
 
-**Throughput**: ~4,919 req/s
+**Throughput**: ~6,381 req/s
 
 **Screenshot of the result:**
 
-![img_8.png](docs/images/img_8.png)
+![img_28.png](docs/images/img_28.png)
 
 ---
 
@@ -135,44 +162,45 @@ throughput_test ✓ [======================================] 200 VUs  2m0s  0591
 
 ```
 
+
      ✓ init status is 200
      ✓ status is 200
      ✓ is valid JSON-RPC
      ✓ has result
 
-     checks.........................: 100.00% ✓ 2753247     ✗ 0     
-     data_received..................: 1.4 GB  11 MB/s
-     data_sent......................: 1.2 GB  10 MB/s
-     dropped_iterations.............: 20853   171.86247/s
-     http_req_blocked...............: avg=6.93µs    min=0s    med=1µs     max=69.25ms  p(90)=1µs     p(95)=2µs    
-     http_req_connecting............: avg=5.41µs    min=0s    med=0s      max=69.23ms  p(90)=0s      p(95)=0s     
-   ✓ http_req_duration..............: avg=25.04ms   min=343µs med=15.9ms  max=374.05ms p(90)=58.22ms p(95)=66.08ms
-       { expected_response:true }...: avg=25.04ms   min=343µs med=15.9ms  max=374.05ms p(90)=58.22ms p(95)=66.08ms
-     http_req_failed................: 0.00%   ✓ 0           ✗ 923847
-     http_req_receiving.............: avg=337.55µs  min=3µs   med=8µs     max=97.08ms  p(90)=51µs    p(95)=444µs  
-     http_req_sending...............: avg=33.94µs   min=1µs   med=3µs     max=36.92ms  p(90)=10µs    p(95)=17µs   
-     http_req_tls_handshaking.......: avg=0s        min=0s    med=0s      max=0s       p(90)=0s      p(95)=0s     
-     http_req_waiting...............: avg=24.66ms   min=314µs med=15.64ms max=363.91ms p(90)=57.82ms p(95)=65.64ms
-     http_reqs......................: 923847  7613.994502/s
-     iteration_duration.............: avg=2.64s     min=1.08s med=2.64s   max=3.79s    p(90)=3.08s   p(95)=3.21s  
-     iterations.....................: 9147    75.386084/s
-     request_latency................: avg=26.140162 min=0     med=17      max=374      p(90)=59      p(95)=67     
-     requests_received..............: 914700  7538.608418/s
-     requests_sent..................: 914700  7538.608418/s
-     vus............................: 80      min=80        max=200 
-     vus_max........................: 200     min=200       max=200 
+     checks.........................: 100.00% ✓ 3112942     ✗ 0      
+     data_received..................: 1.5 GB  13 MB/s
+     data_sent......................: 1.4 GB  12 MB/s
+     dropped_iterations.............: 19658   162.246389/s
+     http_req_blocked...............: avg=9.94µs   min=0s    med=1µs     max=97.74ms p(90)=1µs     p(95)=2µs    
+     http_req_connecting............: avg=8.41µs   min=0s    med=0s      max=97.73ms p(90)=0s      p(95)=0s     
+   ✓ http_req_duration..............: avg=21.86ms  min=326µs med=14.15ms max=1.03s   p(90)=52.48ms p(95)=60.75ms
+       { expected_response:true }...: avg=21.86ms  min=326µs med=14.15ms max=1.03s   p(90)=52.48ms p(95)=60.75ms
+     http_req_failed................: 0.00%   ✓ 0           ✗ 1044542
+     http_req_receiving.............: avg=229.17µs min=3µs   med=7µs     max=93.24ms p(90)=31µs    p(95)=108µs  
+     http_req_sending...............: avg=40.13µs  min=1µs   med=3µs     max=50.94ms p(90)=9µs     p(95)=15µs   
+     http_req_tls_handshaking.......: avg=0s       min=0s    med=0s      max=0s      p(90)=0s      p(95)=0s     
+     http_req_waiting...............: avg=21.59ms  min=299µs med=14.02ms max=1.03s   p(90)=52.2ms  p(95)=60.46ms
+     http_reqs......................: 1044542 8621.078848/s
+     iteration_duration.............: avg=2.33s    min=1s    med=2.36s   max=3.57s   p(90)=2.64s   p(95)=2.71s  
+     iterations.....................: 10342   85.357216/s
+     request_latency................: avg=23.0969  min=0     med=15      max=325     p(90)=54      p(95)=62     
+     requests_received..............: 1034200 8535.721632/s
+     requests_sent..................: 1034200 8535.721632/s
+     vus............................: 59      min=59        max=200  
+     vus_max........................: 200     min=200       max=200  
 
 
-running (2m01.3s), 000/200 VUs, 9147 complete and 0 interrupted iterations
-throughput_test ✓ [======================================] 200 VUs  2m0s  09147/30000 iters, 150 per VU
+running (2m01.2s), 000/200 VUs, 10342 complete and 0 interrupted iterations
+throughput_test ✓ [======================================] 200 VUs  2m0s  10342/30000 iters, 150 per VU
 ```
 
-**Throughput**: ~7,614 req/s
-**Improvement**: +54.8% over Run 1
+**Throughput**: ~8,621 req/s
+**Improvement**: +35.1% over Run 1
 
 **Screenshot of the result:**
 
-![img_9.png](docs/images/img_9.png)
+![img_29.png](docs/images/img_29.png)
 
 ---
 
@@ -185,39 +213,39 @@ throughput_test ✓ [======================================] 200 VUs  2m0s  0914
      ✓ is valid JSON-RPC
      ✓ has result
 
-     checks.........................: 100.00% ✓ 2882075     ✗ 0      
-     data_received..................: 1.5 GB  12 MB/s
-     data_sent......................: 1.3 GB  11 MB/s
-     dropped_iterations.............: 20425   168.357337/s
-     http_req_blocked...............: avg=8.04µs    min=0s    med=1µs     max=83.61ms  p(90)=1µs     p(95)=2µs     
-     http_req_connecting............: avg=6.52µs    min=0s    med=0s      max=83.53ms  p(90)=0s      p(95)=0s      
-   ✓ http_req_duration..............: avg=23.85ms   min=325µs med=15.5ms  max=395.38ms p(90)=55.71ms p(95)=63.38ms 
-       { expected_response:true }...: avg=23.85ms   min=325µs med=15.5ms  max=395.38ms p(90)=55.71ms p(95)=63.38ms 
-     http_req_failed................: 0.00%   ✓ 0           ✗ 967075
-     http_req_receiving.............: avg=337.86µs  min=3µs   med=8µs     max=101.18ms p(90)=47µs    p(95)=447.29µs
-     http_req_sending...............: avg=41.8µs    min=1µs   med=3µs     max=41.08ms  p(90)=10µs    p(95)=17µs    
-     http_req_tls_handshaking.......: avg=0s        min=0s    med=0s      max=0s       p(90)=0s      p(95)=0s      
-     http_req_waiting...............: avg=23.47ms   min=303µs med=15.25ms max=395.37ms p(90)=55.36ms p(95)=62.91ms 
-     http_reqs......................: 967075  7971.318075/s
-     iteration_duration.............: avg=2.52s     min=1.25s med=2.54s   max=3.39s    p(90)=2.87s   p(95)=2.95s   
-     iterations.....................: 9575    78.923941/s
-     request_latency................: avg=24.976921 min=0     med=16      max=395      p(90)=57      p(95)=65      
-     requests_received..............: 957500  7892.394134/s
-     requests_sent..................: 957500  7892.394134/s
-     vus............................: 98      min=98        max=200 
-     vus_max........................: 200     min=200       max=200 
+     checks.........................: 100.00% ✓ 3317020     ✗ 0      
+     data_received..................: 1.6 GB  13 MB/s
+     data_sent......................: 1.5 GB  12 MB/s
+     dropped_iterations.............: 18980   156.681304/s
+     http_req_blocked...............: avg=8.6µs     min=0s    med=1µs     max=91.04ms  p(90)=1µs     p(95)=2µs    
+     http_req_connecting............: avg=6.85µs    min=0s    med=0s      max=90.79ms  p(90)=0s      p(95)=0s     
+   ✓ http_req_duration..............: avg=20.47ms   min=320µs med=13.77ms max=284.63ms p(90)=48.48ms p(95)=56.95ms
+       { expected_response:true }...: avg=20.47ms   min=320µs med=13.77ms max=284.63ms p(90)=48.48ms p(95)=56.95ms
+     http_req_failed................: 0.00%   ✓ 0           ✗ 1113020
+     http_req_receiving.............: avg=218.75µs  min=3µs   med=7µs     max=84.6ms   p(90)=29µs    p(95)=99µs   
+     http_req_sending...............: avg=47.59µs   min=1µs   med=3µs     max=39.1ms   p(90)=9µs     p(95)=15µs   
+     http_req_tls_handshaking.......: avg=0s        min=0s    med=0s      max=0s       p(90)=0s      p(95)=0s     
+     http_req_waiting...............: avg=20.2ms    min=278µs med=13.65ms max=284.61ms p(90)=48.15ms p(95)=56.61ms
+     http_reqs......................: 1113020 9188.062456/s
+     iteration_duration.............: avg=2.19s     min=1.02s med=2.2s    max=3.08s    p(90)=2.48s   p(95)=2.56s  
+     iterations.....................: 11020   90.970915/s
+     request_latency................: avg=21.674092 min=0     med=15      max=285      p(90)=49      p(95)=58     
+     requests_received..............: 1102000 9097.091541/s
+     requests_sent..................: 1102000 9097.091541/s
+     vus............................: 60      min=60        max=200  
+     vus_max........................: 200     min=200       max=200  
 
 
-running (2m01.3s), 000/200 VUs, 9575 complete and 0 interrupted iterations
-throughput_test ✓ [======================================] 200 VUs  2m0s  09575/30000 iters, 150 per VU
+running (2m01.1s), 000/200 VUs, 11020 complete and 0 interrupted iterations
+throughput_test ✓ [======================================] 200 VUs  2m0s  11020/30000 iters, 150 per VU
 ```
 
-**Throughput**: ~7,971 req/s
-**Improvement**: +62.1% over Run 1, +4.7% over Run 2
+**Throughput**: ~9,188 req/s
+**Improvement**: +44.0% over Run 1, +6.6% over Run 2
 
 **Screenshot of the result:**
 
-![img_10.png](docs/images/img_10.png)
+![img_30.png](docs/images/img_30.png)
 
 ---
 
@@ -225,20 +253,20 @@ throughput_test ✓ [======================================] 200 VUs  2m0s  0957
 
 | Metric | Run 1 | Run 2 | Run 3 |
 |--------|-------|-------|-------|
-| **Throughput (req/s)** | 4,919 | 7,614 | 7,971 |
-| **Avg Latency (ms)** | 39.45 | 25.04 | 23.85 |
-| **Median Latency (ms)** | 18.36 | 15.90 | 15.50 |
-| **P90 Latency (ms)** | 88.54 | 58.22 | 55.71 |
-| **P95 Latency (ms)** | 101.63 | 66.08 | 63.38 |
-| **Max Latency (ms)** | 3,100 | 374.05 | 395.38 |
-| **Total Requests** | 597,314 | 923,847 | 967,075 |
+| **Throughput (req/s)** | ~6,381 | ~8,621 | ~9,188 |
+| **Avg Latency (ms)** | 29.99 | 21.86 | 20.47 |
+| **Median Latency (ms)** | 15.28 | 14.15 | 13.77 |
+| **P90 Latency (ms)** | 69.25 | 52.48 | 48.48 |
+| **P95 Latency (ms)** | 92.11 | 60.75 | 56.95 |
+| **Max Latency (ms)** | 4,280 | 1,030 | 284.63 |
+| **Total Requests** | 773,963 | 1,044,542 | 1,113,020 |
 | **Success Rate** | 100% | 100% | 100% |
 
 ## Key Observations
 
 1. **JVM Warm-up Effect**: Performance improved significantly between runs, demonstrating effective JIT compilation optimization
-2. **Consistent Throughput**: Achieved stable ~8K requests/second after warm-up
-3. **Low Latency**: Median latency remained consistently around 15-18ms
+2. **Consistent Throughput**: Achieved stable ~9K requests/second after warm-up
+3. **Low Latency**: Median latency remained consistently around 13–15ms
 4. **Zero Failures**: 100% success rate across all test runs
 5. **Resource Efficiency**: Maintained stable performance with 2 CPU cores and 1GB memory
 
@@ -246,16 +274,16 @@ throughput_test ✓ [======================================] 200 VUs  2m0s  0957
 
 During the performance tests, the container exhibited the following resource utilization patterns:
 
-- **CPU Usage**: Peaked at ~200% (fully utilizing both allocated cores) during each test run, dropping to ~0.35% at idle between runs
-- **Memory Usage**: 706.1MB / 1GB — stabilized at ~706MB after warm-up, with step increases visible during each test run indicating JIT compilation and class loading
-- **Disk Read/Write**: 92.3MB read / 0B write — all disk reads occurred at startup (class loading), zero writes during tests confirming fully in-memory processing
-- **Network I/O**: 3.72GB received / 4.15GB sent cumulative across all three test runs
+- **CPU Usage**: Peaked at ~200% (fully utilizing both allocated cores) during each test run, dropping to ~0.32% at idle between runs
+- **Memory Usage**: 555.5MB / 1GB — stabilized after warm-up, with step increases visible during each test run indicating JIT compilation and class loading
+- **Disk Read/Write**: 46.8MB read / 0B write — all disk reads occurred at startup (class loading), zero writes during tests confirming fully in-memory processing
+- **Network I/O**: 4.37GB received / 4.68GB sent cumulative across all three test runs
 
 The CPU graph shows clear spikes during each of the three test runs, demonstrating efficient utilization of the allocated resources. Memory usage remained stable throughout, indicating no memory leaks or excessive garbage collection pressure.
 
 **Screenshot of Docker container statistics:**
 
-![img_11.png](docs/images/img_11.png)
+![img_31.png](docs/images/img_31.png)
 
 ## Recommendations
 

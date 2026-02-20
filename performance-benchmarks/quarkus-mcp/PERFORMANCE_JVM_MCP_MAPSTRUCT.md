@@ -36,6 +36,23 @@ camelbee:
   logging-enabled: false
 ```
 
+> **Note**: The `McpTools.java` class contains three test configurations. For this test, **Test 2 (MCP Tool + MapStruct)** is active — the MCP tool call goes through a MapStruct DTO mapping (`mcpToDomainOrder` → `domainToMcpOrder`) without involving Apache Camel. Tests 1 and 3 are commented out.
+
+```java 
+@Tool(description = "Create a new order with customer details, product information, and shipping preferences")
+Order createOrder(
+@ToolArg(description = "Order object containing salesChannel, items with productName, quantity, and price") Order order,
+@ToolArg(description = "Client-generated correlation ID for distributed tracing and logging", required = false) String transactionId,
+@ToolArg(description = "Business process correlation ID for end-to-end transaction tracing across systems", required = false) String businessTransactionId
+) {
+
+    com.mycompany.model.domain.Order domainOrder = mcpOrderMapper.mcpToDomainOrder(order);
+    domainOrder.setId("1");
+    return mcpOrderMapper.domainToMcpOrder(domainOrder);
+
+}
+```
+
 ### Docker Compose Configuration
 
 Update the CPU allocation in `docker-compose.yml` to **2 cores** for optimal performance:
