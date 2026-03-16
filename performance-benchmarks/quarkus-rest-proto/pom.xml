@@ -7,7 +7,7 @@
   <parent>
     <groupId>io.camelbee</groupId>
     <artifactId>camelbee-quarkus-starter</artifactId>
-    <version>2.0.8</version>
+    <version>3.0.1</version>
   </parent>
 
   <artifactId>quarkus-rest-proto</artifactId>
