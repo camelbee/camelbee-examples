@@ -4,19 +4,19 @@
 #
 camelbee:
   # when enabled registers the CamelBee event notifier to the Camel context
-  notifier-enabled: false
+  notifier-enabled: yes
   # when enabled configures stream caching, MDC logging and CamelBeeUnitOfWork for routes
-  route-configurer-enabled: false
+  route-configurer-enabled: yes
   # when enabled it allows the CamelBe WebGL application to fetch the topology of the Camel Context.
-  context-enabled: false
+  context-enabled: yes
   # when enabled intercepts/traces request and responses of all camel components and caches messages.
-  tracer-enabled: false
+  tracer-enabled: yes
   # maximum time the tracer can remain idle before deactivation tracing of messages.
   tracer-max-idle-time: 60000
   # maximum collected trace messages
   tracer-max-messages-count: 10000
   # when enabled it logs the messages exchanged between endpoints
-  logging-enabled: false
+  logging-enabled: yes
 
 #
 # Quarkus
@@ -50,15 +50,6 @@ quarkus:
       max-initial-line-length: 4096
     idle-timeout: 30s
     read-timeout: 60s
-    cors:
-      enabled: true
-      origins: https://www.camelbee.io,http://localhost:8083
-      methods: GET
-      headers: "*"
-      exposed-headers: Content-Disposition
-      access-control-allow-credentials: true
-      access-control-max-age: 24H
-    worker-threads: 200  # Worker Threads (request processing)
   test:
     continuous-testing: "disabled"
   smallrye-health:

@@ -54,12 +54,6 @@ management:
       path-mapping:
         prometheus: metrics
         metrics: metrics-default
-      cors:
-        allowed-origins: "https://www.camelbee.io,http://localhost:8083" # Comma-separated list of origins you want to allow
-        allowed-methods: GET  # Allowed HTTP methods. Default to GET.
-        allowed-headers: "*"  # Allowed HTTP headers. Default to "*".
-        allow-credentials: true  # Set to true if you want to allow cookies, authorization headers, etc.
-        max-age: 1800  # Maximum age (in seconds) of the cache duration for CORS preflight responses.
   # show verbose health details (/actuator/info) so you can see Camel information also
   endpoint:
     hystrix:

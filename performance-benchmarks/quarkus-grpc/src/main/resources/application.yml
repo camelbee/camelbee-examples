@@ -53,14 +53,6 @@ quarkus:
       max-initial-line-length: 4096
     idle-timeout: 30s
     read-timeout: 60s
-    cors:
-      enabled: true
-      origins: https://www.camelbee.io,http://localhost:8083
-      methods: GET
-      headers: "*"
-      exposed-headers: Content-Disposition
-      access-control-allow-credentials: true
-      access-control-max-age: 24H
     worker-threads: 200  # Worker Threads (request processing)
   test:
     continuous-testing: "disabled"
