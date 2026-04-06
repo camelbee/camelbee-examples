@@ -1,0 +1,23 @@
+{
+  "priority": 2,
+  "request": {
+    "method": "PUT",
+    "urlPathPattern": "/purchase-service-api/purchases/[0-9]+",
+    "headers": {
+      "transactionId": {
+        "equalTo": "6911185b-f4f0-4435-b3e2-0720fc148b63"
+      },
+      "Accept": {
+        "equalTo": "application/x-protobuf"
+      }
+    }
+  },
+  "response": {
+    "status": 404,
+    "transformers": [],
+    "transformerParameters": {
+    "disableBodyFileTemplating": true
+  },
+  "bodyFileName": "rest/proto/replacepurchase/replacepurchase-error-response.pb"
+  }
+}

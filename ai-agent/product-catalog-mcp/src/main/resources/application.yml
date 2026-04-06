@@ -1,0 +1,211 @@
+
+#
+# CamelBee Specific Configurations
+#
+camelbee:
+  # when enabled registers the CamelBee event notifier to the Camel context
+  notifier-enabled: ${CAMELBEE_NOTIFIER_ENABLED:false}
+  # when enabled configures stream caching, MDC logging and CamelBeeUnitOfWork for routes
+  route-configurer-enabled: ${CAMELBEE_ROUTE_CONFIGURER_ENABLED:true}
+  # when enabled it allows the CamelBee UI to fetch the topology of the Camel Context (disable in production)
+  context-enabled: ${CAMELBEE_CONTEXT_ENABLED:false}
+  # when enabled intercepts/traces request and responses of all camel components and caches messages (disable in production)
+  tracer-enabled: ${CAMELBEE_TRACER_ENABLED:false}
+  # maximum time the tracer can remain idle before deactivation tracing of messages.
+  tracer-max-idle-time: ${CAMELBEE_TRACER_MAX_IDLE_TIME:60000}
+  # maximum collected trace messages
+  tracer-max-messages-count: ${CAMELBEE_TRACER_MAX_MESSAGES_COUNT:10000}
+  # when enabled it logs the messages exchanged between endpoints (disable in production)
+  logging-enabled: ${CAMELBEE_LOGGING_ENABLED:false}
+
+#
+# Quarkus
+#
+quarkus:
+  native:
+    resources:
+      includes:
+        - "mcp/**"
+  vertx:
+    event-loops-pool-size: 8  # Match CPU cores (M1 has 8 perf cores)
+    prefer-native-transport: true  # Use native Netty transport
+    worker-pool-size: 128  # For blocking operations
+  # Register model classes for reflection
+  camel:
+    native:
+      reflection:
+        include-patterns: >
+          com.mycompany.catalog.mcp.model.api.mcp.*,
+          com.mycompany.catalog.mcp.model.infra.json.*,
+  devservices:
+    enabled: false
+  banner:
+    enabled: false
+  http:
+    port: 8080
+    accept-backlog: 4096
+    io-threads: 8  # Match event-loops-pool-size
+    limits:
+      max-body-size: 10M
+      max-chunk-size: 8192
+      max-initial-line-length: 4096
+    idle-timeout: 30s
+    read-timeout: 60s
+    worker-threads: 200  # Worker Threads (request processing)
+  test:
+    continuous-testing: "disabled"
+  smallrye-health:
+    root-path: /health
+
+
+
+  datasource:
+    # default datasource
+    db-kind: postgresql
+    username: ${POSTGRESQL_USERNAME:camelbee_user}
+    password: ${POSTGRESQL_PASSWORD:secret}
+    jdbc:
+      url: ${JDBC_POSTGRESQL_URL:jdbc:postgresql://localhost:5432/CAMELBEE_DATABASE}
+      # Core Agroal properties
+      min-size: 5
+      max-size: 25
+      initial-size: 5
+      acquisition-timeout: 5
+      background-validation-interval: 2M
+      idle-removal-interval: 5M
+      max-lifetime: 30M
+      # PostgreSQL specific properties
+      additional-jdbc-properties:
+        ApplicationName: QuarkusApp
+        tcpKeepAlive: true
+    health:
+      enabled: true
+
+  hibernate-orm:
+    # default persistenceUnit
+    hibernate:
+      ddl-auto: none
+    dialect: org.hibernate.dialect.PostgreSQLDialect
+    packages: com.mycompany.catalog.mcp.model.api.jpa.postgresql,com.mycompany.catalog.mcp.model.infra.jpa.postgresql
+    validate-in-dev-mode: false
+
+
+  index-dependency:
+    camelbeecore:
+      group-id: io.camelbee
+      artifact-id: camelbee-quarkus-core
+  jackson:
+    write-dates-as-timestamps: true
+    fail-on-unknown-properties: false
+    serialization-inclusion: non-null
+  micrometer:
+    export:
+      prometheus:
+        path: /metrics
+  log:
+    category:
+      "io.camelbee":
+        level: WARN
+      "org.apache.camel.component.http":
+        level: WARN
+      "org.apache.camel":
+        level: WARN
+      "io.quarkus.bootstrap.classloading":
+        level: WARN
+    level: WARN
+    console:
+      async: true  # Enable async logging
+      async-overflow: discard  # Don't block on full queue
+    json:
+      fields:
+        timestamp:
+          field-name: "@timestamp"
+        logger-name:
+          field-name: "logger_name"
+        mdc:
+          enabled: true
+          flat-fields: true
+        ndc:
+          enabled: false
+        thread-id:
+          enabled: false
+        hostname:
+          enabled: false
+        sequence:
+          enabled: false
+        process-name:
+          enabled: false
+        process-id:
+          enabled: false
+        logger-class-name:
+          enabled: false
+        thread-name:
+          enabled: false
+
+# Camel
+#
+camel:
+  context:
+    name: product-catalog-mcp    
+  threads:
+    virtual:
+      enabled: true
+
+
+
+
+backend-purchase-rest-api:
+  url: ${BACKEND_REST_URL:http://localhost:8091}/purchase-service-api/purchases
+  uri: /purchase-service-api/purchases
+
+
+
+# TEST
+"%test":
+  quarkus:
+    # Disable JMS/Artemis
+    artemis:
+      enabled: false
+      devservices:
+        enabled: false
+    # Disable JDBC connections
+    datasource:
+      jdbc:
+        enabled: false
+      devservices:
+        enabled: false
+    # Disable Hibernate ORM
+    hibernate-orm:
+      enabled: false
+      database:
+        generation: none
+    # Disable other services
+    redis:
+      devservices:
+        enabled: false
+    kafka:
+      devservices:
+        enabled: false
+    mongodb:
+      devservices:
+        enabled: false
+    camel:
+      routes-discovery:
+        enabled: false
+    http:
+      test-port: 0
+    log:
+      level: DEBUG
+      json:
+        console:
+          enable: false
+
+"%itest":
+  quarkus:
+    http:
+      test-port: 0
+    log:
+      level: DEBUG
+      json:
+        console:
+          enable: false

@@ -1,0 +1,35 @@
+package com.mycompany.catalog.mcp.utils;
+
+import java.net.URI;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.CopyOnWriteArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Verifies messages published by producer routes to messaging backends.
+ * Uses direct client connections to consume/check messages from queues, topics, buckets, and files.
+ * Mirrors the verification logic from integration tests (captureXxx/verifyXxx mock endpoints).
+ */
+public class MessageVerifier implements AutoCloseable {
+
+  private static final Logger log = LoggerFactory.getLogger(MessageVerifier.class);
+
+
+
+
+
+
+
+
+
+
+  @Override
+  public void close() {
+  }
+
+}

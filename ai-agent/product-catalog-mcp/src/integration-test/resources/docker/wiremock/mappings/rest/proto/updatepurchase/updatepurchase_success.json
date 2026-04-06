@@ -1,0 +1,20 @@
+{
+  "priority": 4,
+  "request": {
+    "method": "PATCH",
+    "urlPathPattern": "/purchase-service-api/purchases/[0-9]+",
+    "headers": {
+      "Accept": {
+        "equalTo": "application/x-protobuf"
+      }
+    }
+  },
+  "response": {
+    "status": 201,
+    "transformers": [],
+    "transformerParameters": {
+     "disableBodyFileTemplating": true
+    },
+    "bodyFileName": "rest/proto/updatepurchase/updatepurchase-success-response.pb"
+  }
+}

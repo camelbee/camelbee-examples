@@ -1,0 +1,24 @@
+{
+  "priority": 7,
+  "request": {
+    "method": "GET",
+    "urlPath": "/purchase-service-api/purchases",
+    "headers": {
+      "Accept": {
+        "equalTo": "avro/binary"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "totalPages": "3",
+      "totalPurchases": "12"
+    },
+    "transformers": [],
+    "transformerParameters": {
+     "disableBodyFileTemplating": true
+    },
+    "bodyFileName": "rest/avro/listpurchases/listpurchases-success-page-4-response.avro"
+  }
+}

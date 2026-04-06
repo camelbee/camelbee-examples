@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Purchase>
+    <id>1</id>
+    <salesChannel>ONLINE</salesChannel>
+    <status>Pending</status>
+    <purchaseDate>2026-03-16</purchaseDate>
+    <lastUpdateTimestamp>2026-03-16T08:57:43.208659</lastUpdateTimestamp>
+    <items>
+        <item>
+            <id>01</id>
+            <productId>1001</productId>
+            <productName>Product1001</productName>
+            <quantity>1</quantity>
+            <price>10.2</price>
+        </item>
+        <item>
+            <id>02</id>
+            <productId>1002</productId>
+            <productName>Product1002</productName>
+            <quantity>2</quantity>
+            <price>15.3</price>
+        </item>
+        <item>
+            <id>03</id>
+            <productId>1003</productId>
+            <productName>Product1003</productName>
+            <quantity>3</quantity>
+            <price>20.4</price>
+        </item>
+        <item>
+            <id>04</id>
+            <productId>1004</productId>
+            <productName>Product1004</productName>
+            <quantity>4</quantity>
+            <price>25.5</price>
+        </item>
+        <item>
+            <id>05</id>
+            <productId>1005</productId>
+            <productName>Product1005</productName>
+            <quantity>5</quantity>
+            <price>30.6</price>
+        </item>
+    </items>
+</Purchase>

@@ -1,0 +1,38 @@
+{
+  "id" : "1",
+  "salesChannel" : "ONLINE",
+  "status" : "Pending",
+  "purchaseDate" : "2026-03-16",
+  "lastUpdateTimestamp" : "2026-03-16T08:57:42.00284+01:00",
+  "items" : [ {
+    "id" : "01",
+    "productId" : "1001",
+    "productName" : "Product1001",
+    "quantity" : 1,
+    "price" : 10.2
+  }, {
+    "id" : "02",
+    "productId" : "1002",
+    "productName" : "Product1002",
+    "quantity" : 2,
+    "price" : 15.3
+  }, {
+    "id" : "03",
+    "productId" : "1003",
+    "productName" : "Product1003",
+    "quantity" : 3,
+    "price" : 20.4
+  }, {
+    "id" : "04",
+    "productId" : "1004",
+    "productName" : "Product1004",
+    "quantity" : 4,
+    "price" : 25.5
+  }, {
+    "id" : "05",
+    "productId" : "1005",
+    "productName" : "Product1005",
+    "quantity" : 5,
+    "price" : 30.6
+  } ]
+}

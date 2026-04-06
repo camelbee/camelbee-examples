@@ -1,0 +1,58 @@
+# Include the backend services
+include:
+  - path: src/integration-test/resources/compose-backends.yml
+
+services:
+  # ... dockerized microservice
+  product-catalog-mcp    :
+    build:
+      context: .
+      dockerfile: src/main/docker/Dockerfile.jvm
+    image: camelbee/product-catalog-mcp    
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+    environment:
+      # CamelBee Debugger UI (enabled for local development)
+      CAMELBEE_NOTIFIER_ENABLED: true
+      CAMELBEE_ROUTE_CONFIGURER_ENABLED: true
+      CAMELBEE_CONTEXT_ENABLED: true
+      CAMELBEE_TRACER_ENABLED: true
+      CAMELBEE_LOGGING_ENABLED: true
+      BACKEND_REST_URL: http://wiremock:8080
+
+      JAVA_OPTS: >
+        -XshowSettings:vm
+        -XX:MetaspaceSize=512m
+        -XX:MaxMetaspaceSize=1024m
+        -XX:InitialRAMPercentage=70
+        -XX:MaxRAMPercentage=70
+        -XX:MinRAMPercentage=70
+        -XX:+UseG1GC
+        -XX:MaxGCPauseMillis=200
+        -XX:+UseStringDeduplication
+        -Dcamel.threads.virtual.enabled=true
+        -Dquarkus.http.host=0.0.0.0
+        -Djava.util.logging.manager=org.jboss.logmanager.LogManager
+    depends_on:
+      wiremock:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 4G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+
+networks:
+  default:
+    name: camelbee_default_network
+    driver: bridge

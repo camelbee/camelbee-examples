@@ -1,0 +1,43 @@
+# Include the backend services
+include:
+  - path: ../../integration-test/resources/compose-backends.yml
+
+services:
+  # ... dockerized microservice (native)
+  product-catalog-mcp    :
+    build:
+      context: ../../..
+      dockerfile: src/main/docker/Dockerfile.native
+    image: camelbee/product-catalog-mcp    -native
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+    environment:
+      BACKEND_REST_URL: http://wiremock:8080
+
+      CAMEL_THREADS_VIRTUAL_ENABLED: "true"
+      QUARKUS_HTTP_HOST: 0.0.0.0
+
+    depends_on:
+      wiremock:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+        reservations:
+          cpus: '1'
+          memory: 128M
+    healthcheck:
+      # Use liveness endpoint: Camel readiness probes block the vert.x event loop in Quarkus
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/live"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+
+networks:
+  default:
+    name: camelbee_default_network
+    driver: bridge
