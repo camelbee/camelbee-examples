@@ -14,23 +14,23 @@ public class MessageClient {
 
   private static final Logger log = LoggerFactory.getLogger(MessageClient.class);
 
-
-
-
-
-
-
   public String readResource(String path) {
     try (InputStream is = getClass().getResourceAsStream(path)) {
-      if (is == null) throw new RuntimeException("Resource not found: " + path);
+      if (is == null)
+        throw new RuntimeException("Resource not found: " + path);
       return new String(is.readAllBytes(), StandardCharsets.UTF_8);
-    } catch (IOException e) { throw new RuntimeException(e); }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public byte[] readResourceBinary(String path) {
     try (InputStream is = getClass().getResourceAsStream(path)) {
-      if (is == null) throw new RuntimeException("Resource not found: " + path);
+      if (is == null)
+        throw new RuntimeException("Resource not found: " + path);
       return is.readAllBytes();
-    } catch (IOException e) { throw new RuntimeException(e); }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

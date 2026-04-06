@@ -1,0 +1,85 @@
+openapi: 3.0.3
+info:
+  description: Schema orders and their items
+  title: Order Schema for MCP Tools
+  version: 1.0.0
+servers:
+- url: /
+paths: {}
+components:
+  schemas:
+    Order:
+      properties:
+        id:
+          description: Unique order identifier (server-generated for creates)
+          example: order-12345
+          readOnly: true
+          type: string
+        salesChannel:
+          description: Sales channel identifier
+          example: mcp-agent
+          type: string
+        status:
+          description: Current order status
+          enum:
+          - Pending
+          - Confirmed
+          - Processing
+          - Shipped
+          - Delivered
+          - Completed
+          - Canceled
+          - Returned
+          - Failed
+          - On Hold
+          type: string
+        orderDate:
+          description: Order creation date (server-generated)
+          example: 2025-07-02
+          format: date
+          readOnly: true
+          type: string
+        lastUpdateTimestamp:
+          description: Last update timestamp (server-managed)
+          example: 2025-07-02T10:30:00Z
+          format: date-time
+          readOnly: true
+          type: string
+        items:
+          description: Array of order items
+          items:
+            $ref: '#/components/schemas/OrderItem'
+          minItems: 1
+          type: array
+      required:
+      - salesChannel
+      type: object
+    OrderItem:
+      properties:
+        id:
+          description: Order item identifier (server-generated)
+          example: item-001
+          readOnly: true
+          type: string
+        productId:
+          description: Product identifier
+          example: p1
+          type: string
+        productName:
+          description: Product name
+          example: Widget A
+          type: string
+        quantity:
+          default: 1
+          description: Quantity ordered
+          example: 2
+          minimum: 1
+          type: integer
+        price:
+          description: Price per unit
+          example: 29.99
+          minimum: 0
+          type: number
+      required:
+      - productName
+      type: object

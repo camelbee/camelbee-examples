@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import io.quarkus.jackson.ObjectMapperCustomizer;
+import jakarta.inject.Singleton;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import jakarta.inject.Singleton;
 
 /**
  * Quarkus Camel ObjectMapperCustomizer.

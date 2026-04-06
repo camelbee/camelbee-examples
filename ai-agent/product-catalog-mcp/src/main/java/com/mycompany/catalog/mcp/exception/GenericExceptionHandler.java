@@ -1,18 +1,12 @@
 package com.mycompany.catalog.mcp.exception;
 
-import static com.mycompany.catalog.mcp.constants.Constants.ORIGINAL_ACCEPT_CONTENT_TYPE;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.enterprise.context.ApplicationScoped;
+import lombok.RequiredArgsConstructor;
+import org.apache.camel.Exchange;
 import org.apache.camel.builder.DeadLetterChannelBuilder;
 import org.apache.camel.builder.RouteBuilder;
-
-
-
-import org.apache.camel.Exchange;
-import jakarta.enterprise.context.ApplicationScoped;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.component.jackson.JacksonDataFormat;
-import lombok.RequiredArgsConstructor;
-
 
 /**
  * Global Error Handler.
@@ -24,11 +18,9 @@ import lombok.RequiredArgsConstructor;
 @SuppressWarnings("PMD.TooManyStaticImports")
 public class GenericExceptionHandler extends RouteBuilder {
 
-
   final GlobalErrorProcessor globalErrorProcessor;
 
-    final ObjectMapper mapper;
-
+  final ObjectMapper mapper;
 
   /**
    * The creates a new deadletter channel builder.
@@ -53,19 +45,13 @@ public class GenericExceptionHandler extends RouteBuilder {
     JacksonDataFormat dataFormat = new JacksonDataFormat();
     dataFormat.setObjectMapper(mapper);
 
-      from("direct:error").routeId("errorHandlerRoute")
-          .process(globalErrorProcessor)
-          .choice()
-          .when(this::needsErrorMarshalMcp)
-          .marshal(dataFormat)                  .end()
-;
-
-
-
+    from("direct:error").routeId("errorHandlerRoute")
+        .process(globalErrorProcessor)
+        .choice()
+        .when(this::needsErrorMarshalMcp)
+        .marshal(dataFormat).end();
 
   }
-
-
 
   /**
    * Determines whether the response needs JSON formatting

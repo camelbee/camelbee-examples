@@ -1,11 +1,11 @@
 package com.mycompany.catalog.mcp.utils;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,11 +24,7 @@ public class DataSeeder implements AutoCloseable {
   public void resetData() {
     log.info("Resetting and seeding test data...");
 
-
     resetJpaData();
-
-
-
 
     log.info("Test data seeding completed.");
   }
@@ -69,15 +65,11 @@ public class DataSeeder implements AutoCloseable {
     }
   }
 
-
   private void resetJpaData() {
     log.info("Resetting JPA backend data (POSTGRESQL)...");
     executeSqlScript("jdbc:postgresql://localhost:5432/CAMELBEE_DATABASE", "camelbee_user", "secret",
         "/backend/sql/reset-postgresql.sql", true);
   }
-
-
-
 
   private String readResource(String path) {
     try (InputStream is = getClass().getResourceAsStream(path)) {
@@ -92,7 +84,11 @@ public class DataSeeder implements AutoCloseable {
 
   @Override
   public void close() {
-    try { if (sqlSeederConnection != null && !sqlSeederConnection.isClosed()) sqlSeederConnection.close(); }
-    catch (Exception e) { log.error("Failed to close SQL seeder connection: {}", e.getMessage()); }
+    try {
+      if (sqlSeederConnection != null && !sqlSeederConnection.isClosed())
+        sqlSeederConnection.close();
+    } catch (Exception e) {
+      log.error("Failed to close SQL seeder connection: {}", e.getMessage());
+    }
   }
 }

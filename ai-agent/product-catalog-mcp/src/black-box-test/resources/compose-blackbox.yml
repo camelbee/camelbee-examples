@@ -14,6 +14,7 @@ services:
     restart: unless-stopped
     environment:
       BACKEND_REST_URL: http://wiremock:8080
+      JDBC_POSTGRESQL_URL: jdbc:postgresql://postgresql:5432/CAMELBEE_DATABASE
 
       JAVA_OPTS: >
         -XshowSettings:vm
@@ -31,6 +32,8 @@ services:
     depends_on:
       wiremock:
         condition: service_started
+      flyway-postgresql:
+        condition: service_completed_successfully
     deploy:
       resources:
         limits:

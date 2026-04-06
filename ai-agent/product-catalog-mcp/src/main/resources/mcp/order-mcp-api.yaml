@@ -1,85 +1,92 @@
 openapi: 3.0.3
 info:
-  title: Order Schema for MCP Tools
-  description: Schema orders and their items
+  title: Product Catalog Schema for MCP Tools
+  description: Schema for products and search criteria
   version: 1.0.0
 paths: {}
 components:
   schemas:
-    # Order Domain Schemas - Main schemas used throughout
-    Order:
+    Product:
       type: object
-      required:
-        - salesChannel
       properties:
         id:
           type: string
-          description: Unique order identifier (server-generated for creates)
-          readOnly: true
-          example: "order-12345"
-        salesChannel:
-          type: string
-          description: Sales channel identifier
-          example: "mcp-agent"
-        status:
-          type: string
-          enum:
-            - Pending
-            - Confirmed
-            - Processing
-            - Shipped
-            - Delivered
-            - Completed
-            - Canceled
-            - Returned
-            - Failed
-            - On Hold
-          description: Current order status
-        orderDate:
-          type: string
-          format: date
-          description: Order creation date (server-generated)
-          readOnly: true
-          example: "2025-07-02"
-        lastUpdateTimestamp:
-          type: string
-          format: date-time
-          description: Last update timestamp (server-managed)
-          readOnly: true
-          example: "2025-07-02T10:30:00Z"
-        items:
-          type: array
-          description: Array of order items
-          items:
-            $ref: '#/components/schemas/OrderItem'
-          minItems: 1
-
-    OrderItem:
-      type: object
-      required:
-        - productName
-      properties:
-        id:
-          type: string
-          description: Order item identifier (server-generated)
-          readOnly: true
-          example: "item-001"
-        productId:
-          type: string
-          description: Product identifier
-          example: "p1"
-        productName:
+          description: Unique product identifier
+          example: "prod-001"
+        name:
           type: string
           description: Product name
-          example: "Widget A"
-        quantity:
-          type: integer
-          minimum: 1
-          description: Quantity ordered
-          default: 1
-          example: 2
+          example: "Wireless Mouse"
+        description:
+          type: string
+          description: Product description
+          example: "Ergonomic wireless mouse with USB receiver"
+        category:
+          type: string
+          description: Product category
+          example: "Electronics"
         price:
           type: number
-          minimum: 0
-          description: Price per unit
+          description: Product price
           example: 29.99
+        currency:
+          type: string
+          description: Currency code (ISO 4217)
+          example: "USD"
+        inStock:
+          type: boolean
+          description: Whether the product is in stock
+          example: true
+        imageUrl:
+          type: string
+          description: URL to product image
+          example: "https://example.com/images/wireless-mouse.jpg"
+
+    ProductPage:
+      type: object
+      properties:
+        products:
+          type: array
+          description: List of products on this page
+          items:
+            $ref: '#/components/schemas/Product'
+        page:
+          type: integer
+          description: Current page number
+          example: 1
+        pageSize:
+          type: integer
+          description: Number of items per page
+          example: 10
+        totalPages:
+          type: integer
+          description: Total number of pages
+          example: 5
+        totalItems:
+          type: integer
+          description: Total number of items across all pages
+          example: 47
+
+    ProductSearchCriteria:
+      type: object
+      properties:
+        query:
+          type: string
+          description: Text search query
+          example: "wireless"
+        category:
+          type: string
+          description: Category filter
+          example: "Electronics"
+        minPrice:
+          type: number
+          description: Minimum price filter
+          example: 10.00
+        maxPrice:
+          type: number
+          description: Maximum price filter
+          example: 100.00
+        inStock:
+          type: boolean
+          description: Filter for in-stock products only
+          example: true

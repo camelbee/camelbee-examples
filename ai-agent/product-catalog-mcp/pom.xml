@@ -10,11 +10,11 @@
     <version>3.1.0</version>
   </parent>
 
-  <artifactId>product-catalog-mcp    </artifactId>
+  <artifactId>product-catalog-mcp</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>product-catalog-mcp    </name>
+  <name>product-catalog-mcp</name>
   <description>CamelBee productcatalogservice API</description>
 
   <properties>
@@ -39,9 +39,7 @@
       <artifactId>quarkus-resteasy-jackson</artifactId>
     </dependency>
 
-          
-     
-    
+
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-agroal</artifactId>
@@ -54,7 +52,7 @@
       <artifactId>camel-quarkus-jdbc</artifactId>
     </dependency>
 
-        <dependency>
+    <dependency>
       <groupId>org.apache.camel.quarkus</groupId>
       <artifactId>camel-quarkus-jpa</artifactId>
     </dependency>
@@ -62,20 +60,14 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-hibernate-orm</artifactId>
     </dependency>
-     
-     
-    
-        <dependency>
+
+
+    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-jdbc-postgresql</artifactId>
     </dependency>
-    
-    
-    
-    
-     
 
-                                                  
+
     <dependency>
       <groupId>io.quarkiverse.mcp</groupId>
       <artifactId>quarkus-mcp-server-http</artifactId>
@@ -105,29 +97,17 @@
       <scope>test</scope>
     </dependency>
 
-    
-        <dependency>
+
+    <dependency>
       <groupId>org.apache.camel.quarkus</groupId>
       <artifactId>camel-quarkus-http</artifactId>
     </dependency>
-    
-    
-     
+
 
     <dependency>
       <groupId>org.wiremock</groupId>
       <artifactId>wiremock</artifactId>
     </dependency>
-
-
-    
-
-
-
-
-
-
-    
 
 
     <dependency>
@@ -140,7 +120,6 @@
       <artifactId>awaitility</artifactId>
       <scope>test</scope>
     </dependency>
-
 
 
     <!-- Required for native compilation of jms component -->
@@ -158,7 +137,6 @@
     <!-- Required for generating gRPC service classes that reference javax annotations -->
 
 
-
   </dependencies>
 
   <!-- BUILD: Define specific build plugins here -->
@@ -166,13 +144,13 @@
 
 
     <plugins>
-            <!-- OpenApi Generator -->
+      <!-- OpenApi Generator -->
       <plugin>
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
         <version>${openapi-generator-maven-plugin.version}</version>
         <executions>
-          
+
           <!-- Microservice exposes MCP api, we need to create camel restconfiguration via rest-openapi and model classes using the order-api.yaml  -->
           <execution>
             <id>generate-mcp-sources-api</id>
@@ -199,8 +177,8 @@
               </configOptions>
             </configuration>
           </execution>
-          
-                    <!-- Microservice calls a backend REST api, we need to create model classes using the purchase-api.yaml  -->
+
+          <!-- Microservice calls a backend REST api, we need to create model classes using the purchase-api.yaml  -->
           <execution>
             <id>generate-rest-sources-infra</id>
             <goals>
@@ -226,15 +204,9 @@
               </configOptions>
             </configuration>
           </execution>
-                                      </executions>
+        </executions>
       </plugin>
-       
 
- 
- 
-
-
- 
 
     </plugins>
   </build>

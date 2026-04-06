@@ -1,0 +1,30 @@
+{
+  "priority": 4,
+  "request": {
+    "method": "GET",
+    "urlPath": "/product-service-api/products",
+    "headers": {
+      "Accept": {
+        "equalTo": "application/json"
+      }
+    },
+    "queryParameters": {
+      "page": {
+        "equalTo": "1"
+      },
+      "pageSize": {
+        "equalTo": "10"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "totalPages": "1",
+      "totalItems": "3",
+      "currentPage": "1"
+    },
+    "bodyFileName": "rest/json/listproducts/listproducts-success-page-1-response.json"
+  }
+}

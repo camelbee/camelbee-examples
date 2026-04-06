@@ -1,31 +1,14 @@
 openapi: 3.0.1
 info:
-  title: Purchase Service API
-  description: API for managing purchases and their items
+  title: Product Backend Service API
+  description: Backend API for product catalog
   version: 1.0.0
 paths:
-  /camelbee-service/purchases:
+  /product-service-api/products:
     get:
-      summary: List all purchases
-      operationId: listPurchases
+      summary: List all products with pagination
+      operationId: listProducts
       parameters:
-        - name: transactionId
-          in: header
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: requestId
-          in: header
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: salesChannel
-          in: query
-          required: true
-          schema:
-            type: string
         - name: page
           in: query
           required: false
@@ -40,21 +23,11 @@ paths:
             type: integer
             minimum: 1
             maximum: 100
-            default: 20
+            default: 10
       responses:
         '200':
-          description: A list of purchases
+          description: A paginated list of products
           headers:
-            transactionId:
-              description: Transaction ID
-              schema:
-                type: string
-                format: uuid
-            requestId:
-              description: Request ID
-              schema:
-                type: string
-                format: uuid
             currentPage:
               description: The current page number
               schema:
@@ -63,7 +36,7 @@ paths:
               description: The total number of pages available
               schema:
                 type: integer
-            totalPurchases:
+            totalItems:
               description: The total number of items
               schema:
                 type: integer
@@ -72,95 +45,148 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Purchase'
+                  $ref: '#/components/schemas/Product'
         '400':
           description: Bad Request
-          headers:
-            transactionId:
-              description: Transaction ID
-              schema:
-                type: string
-                format: uuid
-            requestId:
-              description: Request ID
-              schema:
-                type: string
-                format: uuid
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /product-service-api/products/search:
+    get:
+      summary: Search products with filters
+      operationId: searchProducts
+      parameters:
+        - name: query
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: minPrice
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: maxPrice
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: inStock
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: A filtered list of products
           headers:
-            transactionId:
-              description: Transaction ID
+            currentPage:
+              description: The current page number
               schema:
-                type: string
-                format: uuid
-            requestId:
-              description: Request ID
+                type: integer
+            totalPages:
+              description: The total number of pages available
               schema:
-                type: string
-                format: uuid
+                type: integer
+            totalItems:
+              description: The total number of items
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /product-service-api/products/{id}:
+    get:
+      summary: Get a single product by ID
+      operationId: getProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A single product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
 components:
   schemas:
-    Purchase:
+    Product:
       type: object
-      required:
-        - salesChannel
-        - items
       properties:
         id:
           type: string
-        salesChannel:
+        name:
           type: string
-        status:
+        description:
           type: string
-          enum:
-            - Pending
-            - Confirmed
-            - Processing
-            - Shipped
-            - Delivered
-            - Completed
-            - Canceled
-            - Returned
-            - Failed
-            - On Hold
-          description: The status of an purchase
-        purchaseDate:
+        category:
           type: string
-          description: Date format is ISO-8601 format (yyyy-MM-dd)
-          format: date
-        lastUpdateTimestamp:
-          type: string
-          description: Timestamp in ISO-8601 format (yyyy-MM-ddTHH:mm:ssZ)
-          format: date-time
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/PurchaseItem'
-
-    PurchaseItem:
-      type: object
-      required:
-        - productName
-      properties:
-        id:
-          type: string
-        productId:
-          type: string
-        productName:
-          type: string
-        quantity:
-          type: integer
         price:
           type: number
+        currency:
+          type: string
+        inStock:
+          type: boolean
+        imageUrl:
+          type: string
 
     Error:
       type: object
@@ -169,12 +195,3 @@ components:
           type: string
         message:
           type: string
-
-    Purchases:
-      type: object
-      description: A wrapper for a list of purchases
-      properties:
-        purchase:
-          type: array
-          items:
-            $ref: '#/components/schemas/Purchase'

@@ -1,14 +1,12 @@
 package com.mycompany.catalog.mcp.utils;
 
-import java.util.Arrays;
-import java.util.Optional;
 import lombok.SneakyThrows;
 import org.apache.camel.Exchange;
 import org.apache.camel.ValidationException;
 
 /**
  * Utility class providing validation methods for Apache Camel Exchange headers.
- * Contains methods to validate numeric values and sales channel information.
+ * Contains methods to validate numeric values and other input parameters.
  *
  * <p>All path parameters, headers, and query parameters must be validated using appropriate methods
  * from this class to prevent injection attacks (SQL injection, XML injection, script injection, etc.).
@@ -34,24 +32,6 @@ public class ValidationUtils {
       }
     } catch (NumberFormatException e) {
       throw new ValidationException(exchange, headerName + " must be a valid integer!");
-    }
-  }
-
-  /**
-   * Validates the sales channel header value against a predefined list of valid channels.
-   * Valid channels are: ONLINE, RETAIL, and WHOLESALE (case-insensitive).
-   *
-   * @param exchange The Camel Exchange containing the sales channel header
-   * @throws ValidationException if the sales channel is empty or not in the list of valid channels
-   */
-  @SneakyThrows
-  public static void validateSalesChannel(Exchange exchange) {
-    String channel = Optional.ofNullable(exchange.getIn().getHeader("salesChannel", String.class))
-        .map(String::trim)
-        .orElseThrow(() -> new ValidationException(exchange, "Sales channel cannot be empty!"));
-
-    if (!Arrays.asList("ONLINE", "RETAIL", "WHOLESALE", "MCP-AGENT").contains(channel.toUpperCase())) {
-      throw new ValidationException(exchange, "Invalid sales channel!");
     }
   }
 

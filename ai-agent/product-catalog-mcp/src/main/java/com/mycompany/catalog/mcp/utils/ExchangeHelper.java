@@ -51,7 +51,6 @@ public final class ExchangeHelper {
     );
   }
 
-
   /**
    * Converts the "transactionId" header from byte[] to String in-place in the exchange.
    * If the header is not present or not a byte array, nothing happens.

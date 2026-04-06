@@ -2,6 +2,8 @@ package com.mycompany.catalog.mcp.exception;
 
 import com.mycompany.catalog.mcp.exception.response.ResponseFormatter;
 import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Instance;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
@@ -10,8 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelExchangeException;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Instance;
 
 /**
  * Global Error Processor for handling exceptions in Apache Camel routes.
@@ -73,8 +73,7 @@ public class GlobalErrorProcessor implements Processor {
     cause = extractRootCause(cause);
 
     // Handle IOException as a special case to identify the underlying cause
-    if(cause.getClass() == IOException.class)
-    {
+    if (cause.getClass() == IOException.class) {
       cause = extractIoExceptionCause(cause);
     }
 
@@ -83,7 +82,6 @@ public class GlobalErrorProcessor implements Processor {
 
     // Log based on error severity
     logError(meta, cause);
-
 
     // Find appropriate mapper and handle the error
     boolean handled = false;
@@ -140,8 +138,7 @@ public class GlobalErrorProcessor implements Processor {
    */
   private static Throwable extractIoExceptionCause(Throwable ioEx) {
 
-    if(ioEx != null && ioEx.getCause() != null)
-    {
+    if (ioEx != null && ioEx.getCause() != null) {
       return ioEx.getCause();
     }
 

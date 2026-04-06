@@ -38,7 +38,6 @@ public class TestContainerConfiguration {
   /** Application port as defined in the compose file. */
   private static final int APP_PORT = 8080;
 
-
   /** Maximum time to wait for the application health endpoint. */
   private static final Duration APP_STARTUP_TIMEOUT = Duration.ofMinutes(10);
 
@@ -49,24 +48,9 @@ public class TestContainerConfiguration {
 
   static {
 
-
-
-
-
-
-
     ENV.withExposedService("flyway-postgresql", 0, Wait.forLogMessage(".*" + "Database is ready" + ".*", 1));
 
-
-
-
-
-
-
-
     ENV.withExposedService("wiremock", 8080, Wait.forListeningPort());
-
-
 
     ENV.start();
 
@@ -122,6 +106,5 @@ public class TestContainerConfiguration {
   public static String getAppHost() {
     return "localhost";
   }
-
 
 }

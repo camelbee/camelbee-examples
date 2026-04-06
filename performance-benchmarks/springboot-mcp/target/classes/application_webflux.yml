@@ -1,0 +1,162 @@
+
+#
+# CamelBee Specific Configurations
+#
+camelbee:
+  # when enabled registers the CamelBee event notifier to the Camel context
+  notifier-enabled: false
+  # when enabled configures stream caching, MDC logging and CamelBeeUnitOfWork for routes
+  route-configurer-enabled: false
+  # when enabled it allows the CamelBe WebGL application to fetch the topology of the Camel Context.
+  context-enabled: false
+  # when enabled intercepts/traces request and responses of all camel components and caches messages.
+  tracer-enabled: false
+  # maximum time the tracer can remain idle before deactivation tracing of messages.
+  tracer-max-idle-time: 60000
+  # maximum collected trace messages
+  tracer-max-messages-count: 10000
+  # when enabled it logs the messages exchanged between endpoints
+  logging-enabled: false
+
+server:
+  port: 8080
+  reactive:
+    server-factory: netty
+
+#
+# Spring
+#
+spring:
+  main:
+    allow-bean-definition-overriding: true
+    web-application-type: reactive
+  application:
+    name: myservice
+  ai:
+    mcp:
+      server:
+        protocol: STREAMABLE
+
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+# all access to actuator endpoints without security
+management:
+  server:
+    port: 8080
+  security:
+    enabled: false
+  # expose actuator endpoint via HTTP for info,health,camelroutes
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: /
+      path-mapping:
+        prometheus: metrics
+        metrics: metrics-default
+      cors:
+        allowed-origins: "https://www.camelbee.io,http://localhost:8083" # Comma-separated list of origins you want to allow
+        allowed-methods: GET  # Allowed HTTP methods. Default to GET.
+        allowed-headers: "*"  # Allowed HTTP headers. Default to "*".
+        allow-credentials: true  # Set to true if you want to allow cookies, authorization headers, etc.
+        max-age: 1800  # Maximum age (in seconds) of the cache duration for CORS preflight responses.
+  # show verbose health details (/actuator/info) so you can see Camel information also
+  endpoint:
+    hystrix:
+      stream:
+        enabled: true
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  # allow to obtain basic information about Camel routes (read only mode)
+    camelroutes:
+      enabled: true
+      read-only: true
+    
+# Logging
+logging:
+  level:
+    root: INFO
+    org.springframework.web: ERROR
+    org.apache.camel: ERROR
+
+# Camel
+#
+camel:
+  context:
+    name: springboot-mcp
+  threads:
+    virtual:
+      enabled: true
+  springboot:
+    use-breadcrumb: true
+    use-m-d-c-logging: true
+    # The Camel context name
+    name: myservice
+
+  component:
+    servlet:
+      mapping:
+        context-path: /*
+    mapstruct:
+      mapper-package-name: com.mycompany.mapper
+  # jackson properties
+  dataformat:
+    jackson:
+      object-mapper: jacksonObjectMapper
+      disable-features: FAIL_ON_EMPTY_BEANS
+      pretty-print: true
+      include: NON_NULL
+
+
+
+
+    
+
+---
+# ============================================
+# TEST PROFILE
+# ============================================
+spring:
+  config:
+    activate:
+      on-profile: test
+
+logging:
+  level:
+    root: ERROR
+    io.camelbee: ERROR
+
+---
+# ============================================
+# INTEGRATION TEST PROFILE
+# ============================================
+spring:
+  config:
+    activate:
+      on-profile: itest
+
+logging:
+  level:
+    root: DEBUG
+    io.camelbee: DEBUG
+    org.apache.camel: DEBUG
+    org.sprinbootframework: DEBUG
+
+---
+# ============================================
+# PRODUCTION PROFILE
+# ============================================
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    root: ERROR
+    io.camelbee: ERROR

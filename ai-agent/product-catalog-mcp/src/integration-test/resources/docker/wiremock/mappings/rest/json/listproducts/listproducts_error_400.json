@@ -1,0 +1,22 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPath": "/product-service-api/products",
+    "headers": {
+      "Accept": {
+        "equalTo": "application/json"
+      },
+      "transactionId": {
+        "equalTo": "error-rest-400"
+      }
+    }
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "rest/json/listproducts/listproducts-error-response.json"
+  }
+}

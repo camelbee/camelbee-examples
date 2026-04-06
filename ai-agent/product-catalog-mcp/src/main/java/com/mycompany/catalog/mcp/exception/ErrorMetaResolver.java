@@ -1,21 +1,18 @@
 package com.mycompany.catalog.mcp.exception;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import org.hibernate.exception.GenericJDBCException;
-import org.hibernate.exception.SQLGrammarException;
-import org.hibernate.exception.DataException;
 import jakarta.persistence.NoResultException;
 import java.io.IOException;
-import java.util.Map;
 import org.apache.camel.ValidationException;
-import org.apache.cxf.binding.soap.SoapFault;
-import org.apache.cxf.interceptor.Fault;
-import org.apache.hc.client5.http.HttpHostConnectException;
 import org.apache.camel.http.base.HttpOperationFailedException;
+import org.apache.hc.client5.http.HttpHostConnectException;
+import org.hibernate.exception.DataException;
+import org.hibernate.exception.GenericJDBCException;
+import org.hibernate.exception.SQLGrammarException;
 
 /**
  * Resolves exception types to ErrorMeta objects using Java 17 pattern matching.
@@ -63,8 +60,6 @@ public class ErrorMetaResolver {
       return ErrorMeta.of("ERROR-JSON-004", "Invalid data format in request\"", ErrorMeta.BAD_REQUEST);
     }
 
-
-
     // HTTP Operation Failures (use status from exception)
     if (cause instanceof HttpOperationFailedException hofe) {
       int statusCode = hofe.getStatusCode();
@@ -75,7 +70,6 @@ public class ErrorMetaResolver {
     if (cause instanceof HttpHostConnectException) {
       return ErrorMeta.of("ERROR-HTTP-002", "Service temporarily unavailable", ErrorMeta.INTERNAL_SERVER_ERROR);
     }
-
 
     // Not Found Errors (404)
     if (cause instanceof DataNotFoundException) {
@@ -98,10 +92,6 @@ public class ErrorMetaResolver {
       return ErrorMeta.of("ERROR-JPA-004", "Generic JDBC error", ErrorMeta.NOT_FOUND);
     }
 
-
-
-
-
     // IO Errors (500)
     if (cause instanceof IOException) {
       return ErrorMeta.of("ERROR-IO-001", "Error processing request", ErrorMeta.INTERNAL_SERVER_ERROR);
@@ -110,6 +100,5 @@ public class ErrorMetaResolver {
     // Default for unknown errors
     return ErrorMeta.defaultError();
   }
-
 
 }

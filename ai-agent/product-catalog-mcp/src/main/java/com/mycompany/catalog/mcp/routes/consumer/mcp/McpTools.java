@@ -1,102 +1,132 @@
 package com.mycompany.catalog.mcp.routes.consumer.mcp;
 
-import com.mycompany.catalog.mcp.model.api.mcp.Order;
+import com.mycompany.catalog.mcp.model.api.mcp.Product;
+import com.mycompany.catalog.mcp.model.api.mcp.ProductPage;
 import io.quarkiverse.mcp.server.Tool;
 import io.quarkiverse.mcp.server.ToolArg;
 import io.quarkiverse.mcp.server.ToolCallException;
 import io.smallrye.common.annotation.Blocking;
-import io.vertx.ext.web.RoutingContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.FluentProducerTemplate;
 
 /**
- * MCP (Model Context Protocol) Tools for handling order management operations.
+ * MCP (Model Context Protocol) Tools for product catalog operations.
  *
- * <p>This class exposes MCP tools for order operations including:
- * - Order creation (single and batch)
- * - Order retrieval and listing
- * - Order updates and replacements
- * - Order deletion
- *
- * @author camelbee
+ * <p>This class exposes MCP tools for:
+ * - Paginated product listing
+ * - Filtered product search
+ * - Single product retrieval
  */
 @Singleton
-@Blocking  // FluentProducerTemplate.send() is blocking; must not run on the vert.x event loop
+@Blocking
 @Slf4j
 public class McpTools {
 
   @Inject
   FluentProducerTemplate fluentProducerTemplate;
 
-  @Inject
-  RoutingContext routingContext;
-
-
   // =========================================================================
-  // LIST ORDERS
+  // LIST PRODUCTS
   // =========================================================================
 
-  @Tool(description = "List orders with pagination, filtered by sales channel")
-  List<Order> listOrders(
-      @ToolArg(description = "Sales channel to filter by") String salesChannel,
+  @Tool(description = "List products with pagination")
+  ProductPage listProducts(
       @ToolArg(description = "Page number", defaultValue = "1") int page,
-      @ToolArg(description = "Number of orders per page", defaultValue = "10") int pageSize,
-      @ToolArg(description = "Cursor for cursor-based pagination (returned as nextCursor from previous page)", required = false) String cursor,
-      @ToolArg(description = "Client-generated correlation ID for distributed tracing and logging", required = false) String transactionId,
-      @ToolArg(description = "Business process correlation ID for end-to-end transaction tracing across systems", required = false) String businessTransactionId
+      @ToolArg(description = "Number of products per page", defaultValue = "10") int pageSize,
+      @ToolArg(description = "User ID for audit logging", required = false) String userId,
+      @ToolArg(description = "Client-generated correlation ID for distributed tracing", required = false) String transactionId
   ) {
-    log.debug("MCP Tool: listOrders(salesChannel: {}, page: {}, pageSize: {})", salesChannel, page, pageSize);
-
+    log.debug("MCP Tool: listProducts(page: {}, pageSize: {})", page, pageSize);
 
     var result = fluentProducerTemplate
-        .to("direct:mcpListOrders")
-        .withHeader("salesChannel", salesChannel)
+        .to("direct:mcpListProducts")
         .withHeader("page", page)
         .withHeader("pageSize", pageSize)
-        .withHeader("cursor", cursor)
+        .withHeader("userId", userId)
+        .withHeader("toolName", "listProducts")
+        .withHeader("toolParameters", String.format("{\"page\":%d,\"pageSize\":%d}", page, pageSize))
         .withHeader("transactionId", transactionId)
         .send();
 
     if (result.getMessage().getBody() instanceof ToolCallException) {
       throw result.getMessage().getBody(ToolCallException.class);
     } else {
-      return result.getMessage().getBody(List.class);
+      return result.getMessage().getBody(ProductPage.class);
     }
-
   }
 
   // =========================================================================
-  // CREATE ORDER
+  // SEARCH PRODUCTS
   // =========================================================================
 
-  @Tool(description = "Create a new order with customer details, product information, and shipping preferences")
-  Order createOrder(
-      @ToolArg(description = "Order object containing salesChannel, items with productName, quantity, and price") Order order,
-      @ToolArg(description = "Client-generated correlation ID for distributed tracing and logging", required = false) String transactionId,
-      @ToolArg(description = "Business process correlation ID for end-to-end transaction tracing across systems", required = false) String businessTransactionId
+  @Tool(description = "Search products with filters: text query, category, price range, and stock availability")
+  ProductPage searchProducts(
+      @ToolArg(description = "Text search query", required = false) String query,
+      @ToolArg(description = "Category filter", required = false) String category,
+      @ToolArg(description = "Minimum price filter", required = false) Double minPrice,
+      @ToolArg(description = "Maximum price filter", required = false) Double maxPrice,
+      @ToolArg(description = "Filter for in-stock products only", required = false) Boolean inStock,
+      @ToolArg(description = "Page number", defaultValue = "1") int page,
+      @ToolArg(description = "Number of products per page", defaultValue = "10") int pageSize,
+      @ToolArg(description = "User ID for audit logging", required = false) String userId,
+      @ToolArg(description = "Client-generated correlation ID for distributed tracing", required = false) String transactionId
   ) {
-    log.debug("MCP Tool: createOrder(salesChannel: {}, items: {}, transactionId: {}, businessTransactionId: {})",
-        order.getSalesChannel(), order.getItems(), transactionId, businessTransactionId);
-
+    log.debug("MCP Tool: searchProducts(query: {}, category: {}, page: {}, pageSize: {})", query, category, page, pageSize);
 
     var result = fluentProducerTemplate
-        .to("direct:mcpCreateOrder")
+        .to("direct:mcpSearchProducts")
+        .withHeader("query", query)
+        .withHeader("category", category)
+        .withHeader("minPrice", minPrice)
+        .withHeader("maxPrice", maxPrice)
+        .withHeader("inStock", inStock)
+        .withHeader("page", page)
+        .withHeader("pageSize", pageSize)
+        .withHeader("userId", userId)
+        .withHeader("toolName", "searchProducts")
+        .withHeader("toolParameters", String.format(
+            "{\"query\":\"%s\",\"category\":\"%s\",\"minPrice\":%s,\"maxPrice\":%s,\"inStock\":%s,\"page\":%d,\"pageSize\":%d}",
+            query != null ? query : "", category != null ? category : "",
+            minPrice != null ? minPrice : "null", maxPrice != null ? maxPrice : "null",
+            inStock != null ? inStock : "null", page, pageSize))
         .withHeader("transactionId", transactionId)
-        .withBody(order)
         .send();
 
     if (result.getMessage().getBody() instanceof ToolCallException) {
       throw result.getMessage().getBody(ToolCallException.class);
     } else {
-        return result.getMessage().getBody(Order.class);
+      return result.getMessage().getBody(ProductPage.class);
     }
   }
 
+  // =========================================================================
+  // GET PRODUCT
+  // =========================================================================
 
+  @Tool(description = "Get a single product by its ID")
+  Product getProduct(
+      @ToolArg(description = "Product ID") String productId,
+      @ToolArg(description = "User ID for audit logging", required = false) String userId,
+      @ToolArg(description = "Client-generated correlation ID for distributed tracing", required = false) String transactionId
+  ) {
+    log.debug("MCP Tool: getProduct(productId: {})", productId);
 
+    var result = fluentProducerTemplate
+        .to("direct:mcpGetProduct")
+        .withHeader("productId", productId)
+        .withHeader("userId", userId)
+        .withHeader("toolName", "getProduct")
+        .withHeader("toolParameters", String.format("{\"productId\":\"%s\"}", productId != null ? productId : ""))
+        .withHeader("transactionId", transactionId)
+        .send();
 
+    if (result.getMessage().getBody() instanceof ToolCallException) {
+      throw result.getMessage().getBody(ToolCallException.class);
+    } else {
+      return result.getMessage().getBody(Product.class);
+    }
+  }
 
 }

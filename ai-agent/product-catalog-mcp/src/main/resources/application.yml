@@ -4,13 +4,13 @@
 #
 camelbee:
   # when enabled registers the CamelBee event notifier to the Camel context
-  notifier-enabled: ${CAMELBEE_NOTIFIER_ENABLED:false}
+  notifier-enabled: ${CAMELBEE_NOTIFIER_ENABLED:true}
   # when enabled configures stream caching, MDC logging and CamelBeeUnitOfWork for routes
   route-configurer-enabled: ${CAMELBEE_ROUTE_CONFIGURER_ENABLED:true}
   # when enabled it allows the CamelBee UI to fetch the topology of the Camel Context (disable in production)
-  context-enabled: ${CAMELBEE_CONTEXT_ENABLED:false}
+  context-enabled: ${CAMELBEE_CONTEXT_ENABLED:true}
   # when enabled intercepts/traces request and responses of all camel components and caches messages (disable in production)
-  tracer-enabled: ${CAMELBEE_TRACER_ENABLED:false}
+  tracer-enabled: ${CAMELBEE_TRACER_ENABLED:true}
   # maximum time the tracer can remain idle before deactivation tracing of messages.
   tracer-max-idle-time: ${CAMELBEE_TRACER_MAX_IDLE_TIME:60000}
   # maximum collected trace messages
@@ -86,7 +86,7 @@ quarkus:
     hibernate:
       ddl-auto: none
     dialect: org.hibernate.dialect.PostgreSQLDialect
-    packages: com.mycompany.catalog.mcp.model.api.jpa.postgresql,com.mycompany.catalog.mcp.model.infra.jpa.postgresql
+    packages: com.mycompany.catalog.mcp.model.infra.jpa.postgresql
     validate-in-dev-mode: false
 
 
@@ -146,7 +146,7 @@ quarkus:
 #
 camel:
   context:
-    name: product-catalog-mcp    
+    name: product-catalog-mcp
   threads:
     virtual:
       enabled: true
@@ -154,9 +154,10 @@ camel:
 
 
 
-backend-purchase-rest-api:
-  url: ${BACKEND_REST_URL:http://localhost:8091}/purchase-service-api/purchases
-  uri: /purchase-service-api/purchases
+backend-product-rest-api:
+  url: ${BACKEND_REST_URL:http://localhost:8091}/product-service-api/products
+  search-url: ${BACKEND_REST_URL:http://localhost:8091}/product-service-api/products/search
+  uri: /product-service-api/products
 
 
 

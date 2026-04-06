@@ -1,0 +1,6 @@
+README.md
+pom.xml
+src/main/java/com/mycompany/model/api/RestResourceRoot.java
+src/main/java/com/mycompany/model/api/mcp/Order.java
+src/main/java/com/mycompany/model/api/mcp/OrderItem.java
+src/main/openapi/openapi.yaml

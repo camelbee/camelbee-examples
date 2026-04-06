@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteRepositoriesConfiguration">
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Central Repository" />
+      <option name="url" value="https://repo.maven.apache.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="public-remote-maven-mavenorg_snapshots" />
+      <option name="name" value="public-remote-maven-mavenorg" />
+      <option name="url" value="https://vzcdaas.jfrog.io/artifactory/public-remote-maven-mavenorg" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="microservices-maven" />
+      <option name="name" value="microservices-local-maven-main" />
+      <option name="url" value="https://vzcdaas.jfrog.io/artifactory/microservices-local-maven-main" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="myvfzakelijk-maven" />
+      <option name="name" value="myvfzakelijk-local-maven-main" />
+      <option name="url" value="https://vzcdaas.jfrog.io/artifactory/myvfzakelijk-local-maven-main" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="microservices-maven_snapshots" />
+      <option name="name" value="microservices-local-maven-main" />
+      <option name="url" value="https://vzcdaas.jfrog.io/artifactory/microservices-local-maven-main" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="myvfzakelijk-maven_snapshots" />
+      <option name="name" value="myvfzakelijk-local-maven-main" />
+      <option name="url" value="https://vzcdaas.jfrog.io/artifactory/myvfzakelijk-local-maven-main" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Maven Central repository" />
+      <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="jboss.community" />
+      <option name="name" value="JBoss Community repository" />
+      <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="public-remote-maven-mavenorg" />
+      <option name="name" value="public-remote-maven-mavenorg" />
+      <option name="url" value="https://vzcdaas.jfrog.io/artifactory/public-remote-maven-mavenorg" />
+    </remote-repository>
+  </component>
+</project>

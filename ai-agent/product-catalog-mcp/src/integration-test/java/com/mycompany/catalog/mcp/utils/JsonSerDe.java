@@ -87,8 +87,7 @@ public class JsonSerDe<T> {
    *
    * @return The ObjectMapper used for JSON operations.
    */
-  public ObjectMapper getObjectMapper()
-  {
+  public ObjectMapper getObjectMapper() {
     return this.objectMapper;
   }
 }

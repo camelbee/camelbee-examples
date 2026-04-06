@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class IntegrationTestProfile implements QuarkusTestProfile {
+
   @Override
   public String getConfigProfile() {
     return "itest";

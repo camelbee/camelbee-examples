@@ -19,10 +19,10 @@ import org.junit.jupiter.api.TestMethodOrder;
  *
  * <p><b>Two modes of operation:</b></p>
  * <ul>
- *   <li><b>Automatic (default):</b> TestContainers starts the app + backends via Docker Compose</li>
- *   <li><b>Manual:</b> Set {@code -Dbbtest.manual=true} to skip TestContainers and run against
- *       a manually started app (e.g., in IntelliJ debug mode). Optionally set {@code -Dbbtest.host}
- *       and {@code -Dbbtest.port} to configure the target.</li>
+ * <li><b>Automatic (default):</b> TestContainers starts the app + backends via Docker Compose</li>
+ * <li><b>Manual:</b> Set {@code -Dbbtest.manual=true} to skip TestContainers and run against
+ * a manually started app (e.g., in IntelliJ debug mode). Optionally set {@code -Dbbtest.host}
+ * and {@code -Dbbtest.port} to configure the target.</li>
  * </ul>
  *
  * <pre>
@@ -83,7 +83,6 @@ public abstract class BlackBoxTest {
       seeder.resetData();
     }
   }
-
 
   // --- Resource reading helpers ---
 

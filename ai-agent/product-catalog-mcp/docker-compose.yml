@@ -20,6 +20,9 @@ services:
       CAMELBEE_TRACER_ENABLED: true
       CAMELBEE_LOGGING_ENABLED: true
       BACKEND_REST_URL: http://wiremock:8080
+      JDBC_POSTGRESQL_URL: jdbc:postgresql://postgresql:5432/CAMELBEE_DATABASE
+      POSTGRESQL_USERNAME: camelbee_user
+      POSTGRESQL_PASSWORD: secret
 
       JAVA_OPTS: >
         -XshowSettings:vm
@@ -37,6 +40,8 @@ services:
     depends_on:
       wiremock:
         condition: service_started
+      flyway-postgresql:
+        condition: service_completed_successfully
     deploy:
       resources:
         limits:
