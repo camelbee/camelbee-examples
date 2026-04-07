@@ -1,0 +1,17 @@
+{
+  "priority": 5,
+  "request": {
+    "method": "GET",
+    "urlPath": "/products/search",
+    "headers": {
+      "Accept": { "equalTo": "application/json" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "transformers": [],
+    "transformerParameters": { "disableBodyFileTemplating": true },
+    "bodyFileName": "rest/json/searchproducts/searchproducts-success-response.json"
+  }
+}

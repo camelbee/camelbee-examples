@@ -4,17 +4,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.inject.Inject;
 import java.nio.charset.StandardCharsets;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Set;
 import org.apache.camel.CamelContext;
 import org.apache.camel.EndpointInject;
-import org.apache.camel.Exchange;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.component.mock.MockEndpoint;
@@ -34,9 +29,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 @TestInstance(Lifecycle.PER_CLASS)
 public abstract class IntegrationTest extends CamelQuarkusTestSupport {
 
-  protected static final String BASE_PATH_API = "/data/inttest/api/";
-  protected static final String BASE_PATH_INFRA = "/data/inttest/infra/";
-
   @Inject
   protected CamelContext camelContext;
 
@@ -52,11 +44,8 @@ public abstract class IntegrationTest extends CamelQuarkusTestSupport {
   protected static WireMock wireMock;
 
   static {
-
     WireMock.configureFor("localhost", 8091);
-
     wireMock = new WireMock("localhost", 8091);
-
   }
 
   private static boolean initialized = false;
@@ -65,12 +54,6 @@ public abstract class IntegrationTest extends CamelQuarkusTestSupport {
 
   public void setup() throws Exception {
 
-    /*
-     * We use a flag to ensure routes are create or advised only once across all test classes
-     * that extend this base class. A static initialization block cannot be used here
-     * because it would run before Spring injects the camelContext, making it
-     * unavailable during class loading.
-     */
     if (initialized) {
       return;
     }
@@ -83,22 +66,19 @@ public abstract class IntegrationTest extends CamelQuarkusTestSupport {
 
     var modelContext = camelContext.getCamelContextExtension().getContextPlugin(ModelCamelContext.class);
 
-    var routeJpaPurchaseSouthbound = new RouteDefinition();
-    routeJpaPurchaseSouthbound.from("direct:queryDatabaseJpa")
-        .toD("jpa:com.mycompany.product.catalog.model.infra.jpa.postgresql.Purchase?query=${body}");
+    var routeJpaAuditLogSouthbound = new RouteDefinition();
+    routeJpaAuditLogSouthbound.from("direct:queryDatabaseJpa")
+        .toD("jpa:com.mycompany.product.catalog.model.infra.jpa.postgresql.AuditLog?query=${body}");
 
-    modelContext.addRouteDefinition(routeJpaPurchaseSouthbound);
+    modelContext.addRouteDefinition(routeJpaAuditLogSouthbound);
 
-    var routeJdbcPurchaseSouthbound = new RouteDefinition();
-
-    routeJdbcPurchaseSouthbound.from("direct:queryDatabaseJdbc")
+    var routeJdbcSouthbound = new RouteDefinition();
+    routeJdbcSouthbound.from("direct:queryDatabaseJdbc")
         .to("jdbc:default?useHeadersAsParameters=true");
-    modelContext.addRouteDefinition(routeJdbcPurchaseSouthbound);
-
+    modelContext.addRouteDefinition(routeJdbcSouthbound);
   }
 
   protected void resetAllMockedEndpoints() {
-    // Reset all endpoints and set wait time
     captureMockEndpoints.forEach(endpoint -> {
       endpoint.reset();
       endpoint.setResultWaitTime(100);
@@ -111,57 +91,38 @@ public abstract class IntegrationTest extends CamelQuarkusTestSupport {
   }
 
   protected void resetBeforeAll() throws Exception {
-
     resetPersistenceLayers("reset-postgresql.sql", "default", true);
-
   }
 
   private void resetPersistenceLayers(String fileName, String dataSource, boolean isMultiLinesSupported) throws Exception {
-
-    // Remove comments (block, line, and hash-based)
     String cleanedSql = readResource("/backend/sql/%s".formatted(fileName))
-        .replaceAll("/\\*.*?\\*/", "")  // Remove block comments /* ... */
-        .replaceAll("--.*", "")        // Remove single-line comments --
-        .replaceAll("#.*", "");        // Remove single-line comments #
+        .replaceAll("/\\*.*?\\*/", "")
+        .replaceAll("--.*", "")
+        .replaceAll("#.*", "");
 
     if (isMultiLinesSupported) {
-
-      var result = fluentProducerTemplate.to("direct:queryDatabaseJdbc")
+      fluentProducerTemplate.to("direct:queryDatabaseJdbc")
           .withBody(cleanedSql).withHeader("dataSourceName", dataSource).request();
-
     } else {
-      // Split SQL statements to execute them individually
       for (String statement : cleanedSql.split(";")) {
         if (!statement.trim().isEmpty()) {
-          var result = fluentProducerTemplate.to("direct:queryDatabaseJdbc")
+          fluentProducerTemplate.to("direct:queryDatabaseJdbc")
               .withBody(statement.trim()).withHeader("dataSourceName", dataSource).request();
-
         }
       }
     }
-
   }
 
-  protected void clearJpaTables() throws Exception {
+  protected void clearAuditLogTable() throws Exception {
     fluentProducerTemplate.to("direct:queryDatabaseJpa")
-        .withBody("DELETE FROM PurchaseItem purchaseItem")
-        .request();
-    fluentProducerTemplate.to("direct:queryDatabaseJpa")
-        .withBody("DELETE FROM Purchase purchase")
+        .withBody("DELETE FROM AuditLog a")
         .request();
   }
 
   @SuppressWarnings("unchecked")
-  protected List queryJpaPurchases() throws Exception {
+  protected List queryAuditLogs() throws Exception {
     return (List) fluentProducerTemplate.to("direct:queryDatabaseJpa")
-        .withBody("select purchase from Purchase purchase")
-        .request();
-  }
-
-  @SuppressWarnings("unchecked")
-  protected List queryJpaPurchases(String whereClause) throws Exception {
-    return (List) fluentProducerTemplate.to("direct:queryDatabaseJpa")
-        .withBody("select purchase from Purchase purchase WHERE " + whereClause)
+        .withBody("select a from AuditLog a")
         .request();
   }
 
@@ -169,70 +130,16 @@ public abstract class IntegrationTest extends CamelQuarkusTestSupport {
     return IOUtils.resourceToString(path, StandardCharsets.UTF_8);
   }
 
-  protected byte[] readResourceBinary(String path) throws Exception {
-    return IOUtils.resourceToByteArray(path);
-  }
-
-  protected void setBody(Exchange exchange, String payloadFormat, String requestFile) throws Exception {
-    if (isBinaryFormat(payloadFormat)) {
-      byte[] data = readResourceBinary(requestFile);
-      exchange.getIn().setBody(data);
-      exchange.getIn().setHeader("Content-Length", data.length);
-    } else {
-      exchange.getIn().setBody(readResource(requestFile));
-    }
-  }
-
-  protected boolean isBinaryFormat(String payloadFormat) {
-    return Set.of("avro", "proto").contains(payloadFormat);
-  }
-
-  protected String getFilePostFix(String payloadFormat) {
-    if (payloadFormat == null || payloadFormat.isBlank()) {
-      throw new IllegalArgumentException("payloadFormat must not be null or blank");
-    }
-
-    return switch (payloadFormat.toLowerCase()) {
-      case "json" -> "json";
-      case "xml" -> "xml";
-      case "proto" -> "pb";
-      case "avro" -> "avro";
-      default -> throw new IllegalArgumentException(
-          "Unsupported payload format: " + payloadFormat);
-    };
-  }
-
   private static ObjectMapper createObjectMapper() {
     ObjectMapper mapper = new ObjectMapper();
-
-    JavaTimeModule javaTimeModule = new JavaTimeModule();
-    javaTimeModule.addSerializer(
-        java.time.LocalDate.class,
-        new LocalDateSerializer(DateTimeFormatter.ISO_DATE)
-    );
-    javaTimeModule.addSerializer(
-        java.time.OffsetDateTime.class,
-        OffsetDateTimeSerializer.INSTANCE
-    );
-
-    mapper.registerModule(javaTimeModule);
+    mapper.registerModule(new JavaTimeModule());
     mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     mapper.enable(SerializationFeature.INDENT_OUTPUT);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
     return mapper;
   }
 
   protected ObjectMapper getObjectMapper() {
     return objectMapper;
   }
-
-  /* if needed for some port updates in the pipelines
-    @Override
-    public Map<String, String> getConfigOverrides() {
-      var configOverrides = new HashMap<String, String>();
-      configOverrides.put("wiremock.server.port", String.valueOf(ThreadLocalRandom.current().nextInt(10000, 65535 + 1)));
-      return configOverrides;
-    }
-  */
 }

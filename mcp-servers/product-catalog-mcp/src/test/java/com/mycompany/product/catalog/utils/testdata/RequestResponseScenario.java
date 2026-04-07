@@ -1,8 +1,8 @@
 package com.mycompany.product.catalog.utils.testdata;
 
 import com.mycompany.product.catalog.model.domain.Error;
-import com.mycompany.product.catalog.model.domain.Order;
-import java.util.List;
+import com.mycompany.product.catalog.model.domain.PaginatedResponse;
+import com.mycompany.product.catalog.model.domain.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,13 +17,14 @@ import lombok.Setter;
 public class RequestResponseScenario {
 
   private String name;
-  private Order order;
-  private List<Order> orders;
+  private Product product;
+  private PaginatedResponse paginatedResponse;
   private Error error;
   private String page;
   private String pageSize;
-  private String salesChannel;
-  private String status;
+  private String query;
+  private String category;
+  private String productId;
   private String transactionId;
 
 }

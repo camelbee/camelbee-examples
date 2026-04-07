@@ -1,9 +1,7 @@
 package com.mycompany.product.catalog.routes.producer.jpa;
 
-import com.mycompany.product.catalog.constants.Constants;
-import com.mycompany.product.catalog.mapper.infra.JpaPurchaseMapper;
-import com.mycompany.product.catalog.model.domain.Order;
-import com.mycompany.product.catalog.model.infra.jpa.postgresql.Purchase;
+import com.mycompany.product.catalog.mapper.infra.JpaAuditLogMapper;
+import com.mycompany.product.catalog.model.domain.AuditLog;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +9,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.camelbee.config.CamelBeeRouteConfigurer;
 
 /**
- * Jpa Producer Route.
+ * JPA Producer Route for audit log persistence.
  *
  * @author camelbee
  */
@@ -21,7 +19,7 @@ import org.camelbee.config.CamelBeeRouteConfigurer;
 public class JpaProducerRoute extends RouteBuilder {
 
   final CamelBeeRouteConfigurer camelBeeRouteConfigurer;
-  final JpaPurchaseMapper jpaPurchaseMapper;
+  final JpaAuditLogMapper jpaAuditLogMapper;
 
   @Override
   public void configure() throws Exception {
@@ -29,12 +27,13 @@ public class JpaProducerRoute extends RouteBuilder {
     camelBeeRouteConfigurer.configureRoute(this);
     errorHandler(noErrorHandler());
 
-    from("direct:createOrderJpa").routeId("createOrderJpaRoute")
-        .setBody(exchangeProperty(Constants.ORIGINAL_BODY))
-        .convertBodyTo(Purchase.class)
-        .to("jpa:com.mycompany.product.catalog.model.infra.jpa.postgresql.Purchase")
-        .convertBodyTo(Order.class)
-        .setProperty(Constants.ACTUAL_RESPONSE_BODY, body());
+    from("direct:writeAuditLogJpa").routeId("writeAuditLogJpaRoute")
+        .process(e -> {
+          AuditLog domainAuditLog = e.getIn().getBody(AuditLog.class);
+          e.getIn().setBody(jpaAuditLogMapper.domainToJpaAuditLog(domainAuditLog));
+        })
+        .to("jpa:com.mycompany.product.catalog.model.infra.jpa.postgresql.AuditLog")
+        .id("writeAuditLogJpaBackendEndpoint");
 
   }
 

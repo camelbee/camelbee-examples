@@ -1,6 +1,5 @@
 package com.mycompany.product.catalog.routes;
 
-import com.mycompany.product.catalog.model.domain.Order;
 import com.mycompany.product.catalog.utils.testdata.RequestResponseScenario;
 import io.quarkus.test.junit.QuarkusTestProfile;
 import jakarta.inject.Inject;
@@ -27,59 +26,16 @@ public abstract class UnitTest extends CamelQuarkusTestSupport implements Quarku
   @Inject
   protected CamelContext camelContext;
 
-  /**
-   * Retrieves an Order object from a specific test scenario by its filename.
-   * <p>
-   * This method searches all pre-loaded test scenarios and returns the Order
-   * from the first scenario matching the specified filename.
-   * </p>
-   *
-   * @param scenarioName The filename of the test scenario to retrieve
-   * @return The Order object from the requested scenario
-   * @throws NoSuchElementException If no scenario with the specified name is found
-   */
-  protected Order getOrderByScenarioName(List<RequestResponseScenario> singleOrderScenarios, String scenarioName) {
-    Optional<RequestResponseScenario> scenario = singleOrderScenarios.stream()
+  protected RequestResponseScenario getScenarioByName(List<RequestResponseScenario> scenarios, String scenarioName) {
+    Optional<RequestResponseScenario> scenario = scenarios.stream()
         .filter(s -> s.getName().equals(scenarioName))
         .findFirst();
 
-    return scenario.orElseThrow(() -> new NoSuchElementException("No scenario found with name: " + scenarioName))
-        .getOrder();
+    return scenario.orElseThrow(() -> new NoSuchElementException("No scenario found with name: " + scenarioName));
   }
 
-  /**
-   * Retrieves a List of Order objects from a specific test scenario by its filename.
-   * <p>
-   * This method searches all pre-loaded test scenarios and returns the Orders list
-   * from the first scenario matching the specified filename.
-   * </p>
-   *
-   * @param scenarioName The filename of the test scenario to retrieve
-   * @return The List of Order objects from the requested scenario
-   * @throws NoSuchElementException If no scenario with the specified name is found
-   */
-  protected List<Order> getOrdersByScenarioName(List<RequestResponseScenario> multipleOrdersScenarios, String scenarioName) {
-    Optional<RequestResponseScenario> scenario = multipleOrdersScenarios.stream()
-        .filter(s -> s.getName().equals(scenarioName))
-        .findFirst();
-
-    return scenario.orElseThrow(() -> new NoSuchElementException("No scenario found with name: " + scenarioName))
-        .getOrders();
-  }
-
-  /**
-   * Reads resource files from the classpath.
-   * <p>
-   * This utility method loads test data files from the classpath,
-   * typically used for loading test request/response data.
-   * </p>
-   *
-   * @param path The resource path (relative to classpath)
-   * @return The content of the resource as a string
-   * @throws IOException If the resource cannot be read
-   */
   protected String readResource(String path) throws IOException {
-    return IOUtils.resourceToString(path, StandardCharsets.UTF_8);
+    return IOUtils.resourceToString(path, java.nio.charset.StandardCharsets.UTF_8);
   }
 
   @Override

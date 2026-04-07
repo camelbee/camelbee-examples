@@ -1,0 +1,21 @@
+{
+  "priority": 4,
+  "request": {
+    "method": "GET",
+    "urlPath": "/products",
+    "headers": {
+      "Accept": { "equalTo": "application/json" }
+    },
+    "queryParameters": {
+      "page": { "equalTo": "4" },
+      "pageSize": { "equalTo": "5" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "transformers": [],
+    "transformerParameters": { "disableBodyFileTemplating": true },
+    "bodyFileName": "rest/json/listproducts/listproducts-success-page-4-response.json"
+  }
+}

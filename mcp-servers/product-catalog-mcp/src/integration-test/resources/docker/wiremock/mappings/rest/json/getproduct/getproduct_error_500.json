@@ -1,0 +1,15 @@
+{
+  "priority": 2,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/products/error-500",
+    "headers": {
+      "Accept": { "equalTo": "application/json" }
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": { "Content-Type": "application/json" },
+    "bodyFileName": "rest/json/getproduct/getproduct-error-response.json"
+  }
+}

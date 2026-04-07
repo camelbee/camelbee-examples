@@ -1,0 +1,10 @@
+{
+  "items": [
+    { "id": "prod-011", "name": "Webcam Cover", "description": "Privacy webcam cover", "category": "Accessories", "price": 4.99, "currency": "USD", "inStock": true, "imageUrl": "https://example.com/cover.jpg" },
+    { "id": "prod-012", "name": "Wireless Charger", "description": "Fast wireless charger", "category": "Electronics", "price": 19.99, "currency": "USD", "inStock": true, "imageUrl": "https://example.com/charger.jpg" }
+  ],
+  "page": 3,
+  "pageSize": 5,
+  "totalPages": 3,
+  "totalItems": 12
+}

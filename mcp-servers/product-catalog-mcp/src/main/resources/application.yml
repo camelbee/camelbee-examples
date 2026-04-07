@@ -86,7 +86,7 @@ quarkus:
     hibernate:
       ddl-auto: none
     dialect: org.hibernate.dialect.PostgreSQLDialect
-    packages: com.mycompany.product.catalog.model.api.jpa.postgresql,com.mycompany.product.catalog.model.infra.jpa.postgresql
+    packages: com.mycompany.product.catalog.model.infra.jpa.postgresql
     validate-in-dev-mode: false
 
 
@@ -154,9 +154,10 @@ camel:
 
 
 
-backend-purchase-rest-api:
-  url: ${BACKEND_REST_URL:http://localhost:8091}/purchase-service-api/purchases
-  uri: /purchase-service-api/purchases
+backend-product-rest-api:
+  url: ${BACKEND_REST_URL:http://localhost:8091}/products
+  search-url: ${BACKEND_REST_URL:http://localhost:8091}/products/search
+  uri: /products
 
 
 

@@ -1,0 +1,13 @@
+{
+  "items": [
+    { "id": "prod-006", "name": "Headphones", "description": "Noise canceling headphones", "category": "Electronics", "price": 149.99, "currency": "USD", "inStock": true, "imageUrl": "https://example.com/headphones.jpg" },
+    { "id": "prod-007", "name": "Mouse Pad", "description": "Large mouse pad", "category": "Accessories", "price": 14.99, "currency": "USD", "inStock": true, "imageUrl": "https://example.com/mousepad.jpg" },
+    { "id": "prod-008", "name": "USB Hub", "description": "7-port USB 3.0 hub", "category": "Electronics", "price": 24.99, "currency": "USD", "inStock": false, "imageUrl": "https://example.com/hub.jpg" },
+    { "id": "prod-009", "name": "Cable Organizer", "description": "Desktop cable organizer", "category": "Accessories", "price": 12.99, "currency": "USD", "inStock": true, "imageUrl": "https://example.com/organizer.jpg" },
+    { "id": "prod-010", "name": "Laptop Stand", "description": "Aluminum laptop stand", "category": "Accessories", "price": 39.99, "currency": "USD", "inStock": true, "imageUrl": "https://example.com/laptopstand.jpg" }
+  ],
+  "page": 2,
+  "pageSize": 5,
+  "totalPages": 3,
+  "totalItems": 12
+}

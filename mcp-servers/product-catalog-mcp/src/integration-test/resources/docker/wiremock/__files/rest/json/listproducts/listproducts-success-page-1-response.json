@@ -1,0 +1,13 @@
+{
+  "items": [
+    { "id": "prod-001", "name": "Wireless Mouse", "description": "Ergonomic wireless mouse", "category": "Electronics", "price": 29.99, "currency": "USD", "inStock": true, "imageUrl": "https://example.com/mouse.jpg" },
+    { "id": "prod-002", "name": "USB Keyboard", "description": "Mechanical USB keyboard", "category": "Electronics", "price": 79.99, "currency": "USD", "inStock": true, "imageUrl": "https://example.com/keyboard.jpg" },
+    { "id": "prod-003", "name": "Monitor Stand", "description": "Adjustable monitor stand", "category": "Accessories", "price": 49.99, "currency": "USD", "inStock": false, "imageUrl": "https://example.com/stand.jpg" },
+    { "id": "prod-004", "name": "Webcam HD", "description": "1080p HD webcam", "category": "Electronics", "price": 59.99, "currency": "USD", "inStock": true, "imageUrl": "https://example.com/webcam.jpg" },
+    { "id": "prod-005", "name": "Desk Lamp", "description": "LED desk lamp with dimmer", "category": "Accessories", "price": 34.99, "currency": "USD", "inStock": true, "imageUrl": "https://example.com/lamp.jpg" }
+  ],
+  "page": 1,
+  "pageSize": 5,
+  "totalPages": 3,
+  "totalItems": 12
+}

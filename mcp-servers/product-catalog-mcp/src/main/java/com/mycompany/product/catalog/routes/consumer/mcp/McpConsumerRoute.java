@@ -1,16 +1,17 @@
 package com.mycompany.product.catalog.routes.consumer.mcp;
 
 import com.mycompany.product.catalog.exception.GenericExceptionHandler;
-import com.mycompany.product.catalog.mapper.api.McpOrderMapper;
+import com.mycompany.product.catalog.mapper.api.McpProductMapper;
+import com.mycompany.product.catalog.model.domain.PaginatedResponse;
+import com.mycompany.product.catalog.model.domain.Product;
 import jakarta.enterprise.context.ApplicationScoped;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.builder.RouteBuilder;
 import org.camelbee.config.CamelBeeRouteConfigurer;
 
 /**
- * Grpahql Listener Route.
+ * MCP Consumer Route for Product Catalog operations.
  *
  * @author camelbee
  */
@@ -22,32 +23,37 @@ public class McpConsumerRoute extends RouteBuilder {
 
   final CamelBeeRouteConfigurer camelBeeRouteConfigurer;
   final GenericExceptionHandler genericExceptionHandler;
+  final McpProductMapper mcpProductMapper;
 
-  final McpOrderMapper mcpOrderMapper;
-
-  /**
-   * Configure.
-   *
-   * @throws Exception the exception
-   */
   @Override
   public void configure() throws Exception {
 
     camelBeeRouteConfigurer.configureRoute(this);
     errorHandler(genericExceptionHandler.appErrorHandler());
 
-    from("direct:mcpListOrders")
-        .routeId("mcpListOrdersRoute")
-        .to("direct:centralListOrders")
+    from("direct:mcpListProducts")
+        .routeId("mcpListProductsRoute")
+        .to("direct:centralListProducts")
         .process(e -> {
-          e.getIn().setBody(mcpOrderMapper.domainToMcpOrders((List<com.mycompany.product.catalog.model.domain.Order>) e.getIn().getBody()));
+          PaginatedResponse domainResponse = e.getIn().getBody(PaginatedResponse.class);
+          e.getIn().setBody(mcpProductMapper.domainToMcpPaginatedResponse(domainResponse));
         });
 
-    from("direct:mcpCreateOrder")
-        .routeId("mcpCreateOrderRoute")
-        .convertBodyTo(com.mycompany.product.catalog.model.domain.Order.class)
-        .to("direct:centralCreateOrder")
-        .convertBodyTo(com.mycompany.product.catalog.model.api.mcp.Order.class);
+    from("direct:mcpSearchProducts")
+        .routeId("mcpSearchProductsRoute")
+        .to("direct:centralSearchProducts")
+        .process(e -> {
+          PaginatedResponse domainResponse = e.getIn().getBody(PaginatedResponse.class);
+          e.getIn().setBody(mcpProductMapper.domainToMcpPaginatedResponse(domainResponse));
+        });
+
+    from("direct:mcpGetProduct")
+        .routeId("mcpGetProductRoute")
+        .to("direct:centralGetProduct")
+        .process(e -> {
+          Product domainProduct = e.getIn().getBody(Product.class);
+          e.getIn().setBody(mcpProductMapper.domainToMcpProduct(domainProduct));
+        });
 
   }
 
