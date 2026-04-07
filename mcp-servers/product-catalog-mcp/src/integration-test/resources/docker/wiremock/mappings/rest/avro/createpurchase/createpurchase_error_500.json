@@ -1,0 +1,23 @@
+{
+  "priority": 3,
+  "request": {
+    "method": "POST",
+    "url": "/purchase-service-api/purchases",
+    "headers": {
+      "transactionId": {
+        "equalTo": "6037ac1b-edae-4f82-8a8f-e7724041ae08"
+      },
+      "Accept": {
+        "equalTo": "avro/binary"
+      }
+    }
+  },
+  "response": {
+    "status": 500,
+    "transformers": [],
+    "transformerParameters": {
+    "disableBodyFileTemplating": true
+  },
+  "bodyFileName": "rest/avro/createpurchase/createpurchase-error-response.avro"
+  }
+}

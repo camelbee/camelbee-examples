@@ -1,0 +1,35 @@
+{
+  "priority": 4,
+  "request": {
+    "method": "GET",
+    "urlPath": "/purchase-service-api/purchases",
+    "headers": {
+      "Accept": {
+        "equalTo": "application/json"
+      }
+    },
+    "queryParameters": {
+      "page": {
+        "equalTo": "1"
+      },
+      "pageSize": {
+        "equalTo": "5"
+      },
+      "salesChannel": {
+        "equalTo": "ONLINE"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "totalPages": "3",
+      "totalPurchases": "12"
+    },
+    "transformers": [],
+    "transformerParameters": {
+     "disableBodyFileTemplating": true
+    },
+    "bodyFileName": "rest/json/listpurchases/listpurchases-success-page-1-response.json"
+  }
+}

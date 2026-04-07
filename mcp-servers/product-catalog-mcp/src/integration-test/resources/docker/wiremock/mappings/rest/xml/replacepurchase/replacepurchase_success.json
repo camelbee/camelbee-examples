@@ -1,0 +1,20 @@
+{
+  "priority": 4,
+  "request": {
+    "method": "PUT",
+    "urlPathPattern": "/purchase-service-api/purchases/[0-9]+",
+    "headers": {
+      "Accept": {
+        "equalTo": "application/xml"
+      }
+    }
+  },
+  "response": {
+    "status": 201,
+    "transformers": [],
+    "transformerParameters": {
+     "disableBodyFileTemplating": true
+    },
+    "bodyFileName": "rest/xml/replacepurchase/replacepurchase-success-response.xml"
+  }
+}

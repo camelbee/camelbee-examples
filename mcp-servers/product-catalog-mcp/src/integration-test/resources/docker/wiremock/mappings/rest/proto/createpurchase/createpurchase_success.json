@@ -1,0 +1,20 @@
+{
+  "priority": 4,
+  "request": {
+    "method": "POST",
+    "url": "/purchase-service-api/purchases",
+    "headers": {
+      "Accept": {
+        "equalTo": "application/x-protobuf"
+      }
+    }
+  },
+  "response": {
+    "status": 201,
+    "transformers": [],
+    "transformerParameters": {
+     "disableBodyFileTemplating": true
+    },
+    "bodyFileName": "rest/proto/createpurchase/createpurchase-success-response.pb"
+  }
+}

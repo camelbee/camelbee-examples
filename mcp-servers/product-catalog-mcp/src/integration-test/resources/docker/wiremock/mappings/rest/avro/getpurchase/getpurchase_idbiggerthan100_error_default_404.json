@@ -1,0 +1,20 @@
+{
+  "priority": 4,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/purchase-service-api/purchases/(?!\\d{1,2}$)\\d+",
+    "headers": {
+      "Accept": {
+        "equalTo": "avro/binary"
+      }
+    }
+  },
+  "response": {
+    "status": 404,
+    "transformers": [],
+    "transformerParameters": {
+    "disableBodyFileTemplating": true
+  },
+  "bodyFileName": "rest/avro/getpurchase/getpurchase-error-response.avro"
+  }
+}

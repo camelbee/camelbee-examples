@@ -1,0 +1,23 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "POST",
+    "url": "/purchase-service-api/purchases",
+    "headers": {
+      "transactionId": {
+        "equalTo": "9d47cfe5-4bf3-41a3-abcf-9249e6b3fae4"
+      },
+      "Accept": {
+        "equalTo": "application/x-protobuf"
+      }
+    }
+  },
+  "response": {
+    "status": 400,
+    "transformers": [],
+    "transformerParameters": {
+    "disableBodyFileTemplating": true
+  },
+  "bodyFileName": "rest/proto/createpurchase/createpurchase-error-response.pb"
+  }
+}
