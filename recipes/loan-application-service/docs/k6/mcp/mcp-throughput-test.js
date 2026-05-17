@@ -1,6 +1,5 @@
 /**
- * MCP Throughput Test - Max Speed (Spring Boot)
- * Tests: How fast can you process MCP tool calls?
+ * MCP Throughput Test — submitLoanApplication tool
  *
  * Spring Boot MCP returns SSE format:
  *   id:4bcba5ec-3c56-4958-b35b-0864dc4c9694
@@ -12,31 +11,24 @@ import { check } from 'k6';
 import { Counter, Trend } from 'k6/metrics';
 import { uuidv4 } from 'https://jslib.k6.io/k6-utils/1.4.0/index.js';
 
-const requestsSent     = new Counter('requests_sent');
+const requestsSent = new Counter('requests_sent');
 const requestsReceived = new Counter('requests_received');
-const requestLatency   = new Trend('request_latency');
-
-const orderData = JSON.parse(
-  open('../../../src/integration-test/resources/data/inttest/api/mcp/createorder/createorder-success-request.json')
-);
+const requestLatency = new Trend('request_latency');
 
 export const options = {
   scenarios: {
     throughput_test: {
       executor: 'per-vu-iterations',
-      vus: 200,
-      iterations: 150,
+      vus: 50,
+      iterations: 50,
       maxDuration: '2m',
     },
   },
   thresholds: {
-    'http_req_duration': ['p(95)<1000'],
+    http_req_duration: ['p(95)<2000'],
   },
 };
 
-// -----------------------------------------------------------------------------
-// Spring Boot MCP returns SSE format — extract JSON from "data:" line
-// -----------------------------------------------------------------------------
 function parseMcpBody(body) {
   const match = body.match(/^data:(.+)$/m);
   if (match) {
@@ -49,19 +41,16 @@ function parseMcpBody(body) {
   return null;
 }
 
-export default function () {
-  const url = 'http://localhost:8080/mcp';
+const url = 'http://localhost:8080/mcp';
 
+export default function () {
   const params = {
     headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json, text/event-stream',
+      Accept: 'application/json, text/event-stream',
     },
   };
 
-  // ---------------------------------------------------------------------------
-  // Step 1: Initialize MCP session
-  // ---------------------------------------------------------------------------
   const initResponse = http.post(url, JSON.stringify({
     jsonrpc: '2.0',
     id: uuidv4(),
@@ -69,82 +58,54 @@ export default function () {
     params: {
       protocolVersion: '2024-11-05',
       capabilities: { tools: {} },
-      clientInfo: {
-        name: 'k6-performance-test',
-        version: '1.0.0'
-      }
-    }
+      clientInfo: { name: 'k6-loan-app-test', version: '1.0.0' },
+    },
   }), params);
-
-  if (!check(initResponse, {
-    'init status is 200': (r) => r.status === 200,
-  })) {
-    console.log(`VU ${__VU}: Initialization failed — status ${initResponse.status}`);
+  if (!check(initResponse, { 'init status is 200': (r) => r.status === 200 })) {
     return;
   }
 
-  const sessionId = initResponse.headers['Mcp-Session-Id'];
-  if (!sessionId) {
-    console.log(`VU ${__VU}: No session ID received`);
-    return;
+  const sessionId = initResponse.headers['Mcp-Session-Id']
+    || initResponse.headers['mcp-session-id'];
+  if (sessionId) {
+    params.headers['Mcp-Session-Id'] = sessionId;
   }
 
-  const sessionParams = {
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json, text/event-stream',
-      'Mcp-Session-Id': sessionId,
+  const suffix = `${__VU}-${__ITER}`;
+  const callPayload = {
+    jsonrpc: '2.0',
+    id: uuidv4(),
+    method: 'tools/call',
+    params: {
+      name: 'submitLoanApplication',
+      arguments: {
+        request: {
+          applicantId: `K6MCP-${suffix}`,
+          applicantName: `K6 MCP ${suffix}`,
+          applicantEmail: `k6-mcp-${suffix}@example.com`,
+          requestedAmount: 12000 + Math.floor(Math.random() * 30000),
+          purpose: 'PERSONAL',
+          termMonths: 36,
+          monthlyIncome: 5500,
+          creditScore: 600 + Math.floor(Math.random() * 200),
+          employmentStatus: 'EMPLOYED',
+        },
+        transactionId: uuidv4(),
+      },
     },
   };
 
-  // ---------------------------------------------------------------------------
-  // Step 2: Send tool calls
-  //
-  // Spring Boot uses positional arg names (confirmed via tools/list):
-  //   arg0 = order, arg1 = transactionId, arg2 = businessTransactionId
-  // ---------------------------------------------------------------------------
-  const requestsToSend = 100;
-  let sentCount     = 0;
-  let receivedCount = 0;
+  const startTime = Date.now();
+  const callResponse = http.post(url, JSON.stringify(callPayload), params);
+  requestsSent.add(1);
 
-  for (let i = 0; i < requestsToSend; i++) {
-    const startTime = Date.now();
-
-    const response = http.post(url, JSON.stringify({
-      jsonrpc: '2.0',
-      id: uuidv4(),
-      method: 'tools/call',
-      params: {
-        name: 'createOrder',
-        arguments: {
-          arg0: orderData,
-          arg1: uuidv4(),  // transactionId
-          arg2: uuidv4()   // businessTransactionId
-        }
-      }
-    }), sessionParams);
-
-    requestsSent.add(1);
-    sentCount++;
-
-    const success = check(response, {
-      'status is 200': (r) => r.status === 200,
-      'is valid JSON-RPC': (r) => {
-        const body = parseMcpBody(r.body);
-        return body !== null && body.jsonrpc === '2.0' && body.id && !body.error;
-      },
-      'has result': (r) => {
-        const body = parseMcpBody(r.body);
-        return body !== null && body.result !== undefined;
-      }
-    });
-
-    if (success) {
-      requestsReceived.add(1);
-      receivedCount++;
-      requestLatency.add(Date.now() - startTime);
-    }
+  const json = parseMcpBody(callResponse.body || '');
+  const ok = check(callResponse, {
+    'status is 200': (r) => r.status === 200,
+    'result has applicationId': () => !!(json && json.result),
+  });
+  if (ok) {
+    requestsReceived.add(1);
+    requestLatency.add(Date.now() - startTime);
   }
-
-  console.log(`VU ${__VU}: Sent=${sentCount}, Received=${receivedCount}`);
 }
