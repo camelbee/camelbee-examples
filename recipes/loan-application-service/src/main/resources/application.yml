@@ -172,13 +172,13 @@ camelbeeservice:
     host: ${CACHE_REDIS_HOST:localhost}
     port: ${CACHE_REDIS_PORT:6379}
 
-  northbound-updateorder-topic: camelbeeservice-northbound-updateorder-topic
-  southbound-createorder-topic: camelbeeservice-southbound-createorder-topic
-  southbound-updateorder-topic: camelbeeservice-southbound-updateorder-topic
+  northbound-submitted-topic: loan-applications.submitted
+  southbound-submitted-topic: loan-applications.submitted
+  southbound-processed-topic: loan-applications.processed
 
-backend-purchase-rest-api:
-  url: ${BACKEND_REST_URL:http://localhost:8091}/purchase-service-api/purchases
-  uri: /purchase-service-api/purchases
+backend-credit-bureau-api:
+  url: ${BACKEND_REST_URL:http://localhost:8091}/credit-assessments
+  uri: /credit-assessments
 
     
 

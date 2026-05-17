@@ -1,100 +1,89 @@
 package io.fintech.loan.application.service.routes.central;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import io.fintech.loan.application.service.model.domain.Order;
+import io.fintech.loan.application.service.exception.DataNotFoundException;
+import io.fintech.loan.application.service.model.domain.LoanApplication;
 import io.fintech.loan.application.service.routes.UnitTest;
-import io.fintech.loan.application.service.utils.testdata.GetOrderDomainTestDataProducer;
-import io.fintech.loan.application.service.utils.testdata.GetOrderDomainTestDataProducer.RequestScenarios;
-import io.fintech.loan.application.service.utils.testdata.RequestResponseScenario;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import io.fintech.loan.application.service.utils.TestDataFactory;
 import org.apache.camel.EndpointInject;
-import org.apache.camel.Exchange;
-import org.apache.camel.ValidationException;
 import org.apache.camel.builder.AdviceWith;
-import org.apache.camel.builder.ExchangeBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.camelbee.config.CamelBeeRouteConfigurer;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-/**
- * Unit Test for testing sunny and rainy day scenarios for the Ubuy Rest backend
- * in the Order Route.
- *
- * @author camelbee
- *
- */
-@SpringBootTest(classes = {
-    CentralGetOrderRoute.class,
-    CamelBeeRouteConfigurer.class
-})
+@DisplayName("CentralGetLoanApplicationRoute — cache-aside")
 class CentralGetOrderRouteUnitTest extends UnitTest {
 
-  @EndpointInject(value = "mock:getOrderJpaEndpoint")
-  protected MockEndpoint mockGetOrderJpaEndpoint;
+  @EndpointInject("mock:cacheRead")
+  protected MockEndpoint mockCacheRead;
+  @EndpointInject("mock:jpaRead")
+  protected MockEndpoint mockJpaRead;
+  @EndpointInject("mock:cacheWarm")
+  protected MockEndpoint mockCacheWarm;
 
-  private final List<RequestResponseScenario> getOrderScenarios = GetOrderDomainTestDataProducer.generateGetOrderRequests();
-
-  @BeforeEach
-  public void setup() throws Exception {
-
-    AdviceWith.adviceWith(camelContext, "centralGetOrderRoute", a -> {
-      a.weaveById("getOrderJpaEndpoint").replace().to("mock:getOrderJpaEndpoint");
+  @Test
+  @DisplayName("Cache hit: returns cached body, JPA NOT called")
+  void test_CacheHit() throws Exception {
+    LoanApplication cached = TestDataFactory.bureauApprovalInput();
+    AdviceWith.adviceWith(camelContext, "centralGetLoanApplicationRoute", a -> {
+      a.weaveById("getOrderCacheEndpoint").replace().process(e -> e.getIn().setBody(cached)).to("mock:cacheRead");
+      a.weaveById("getOrderJpaEndpoint").replace().to("mock:jpaRead");
+      a.weaveById("cacheWarmOnMissEndpoint").replace().to("mock:cacheWarm");
     });
-
     camelContext.start();
-  }
 
-  @Test
-  @org.junit.jupiter.api.Order(1)
-  void given_InvalidOrder_When_GetOrderRouteCalled_And_ValidationFailed_Then_ResultIsValidationError() throws Exception {
+    mockCacheRead.expectedMessageCount(1);
+    mockJpaRead.expectedMessageCount(0);
+    mockCacheWarm.expectedMessageCount(0);
 
-    // Verify mock expectations
-    MockEndpoint.expectsMessageCount(0);
-
-    var result = callTestRoute(RequestScenarios.GET_ORDER_ERROR_NULL_ID);
-
-    // Verify result
-    assertThat(result.getException()).isInstanceOf(ValidationException.class);
-
-    // Verify mock expectations
-    MockEndpoint.assertIsSatisfied(camelContext);
-
-  }
-
-  @Test
-  @org.junit.jupiter.api.Order(2)
-  void given_ValidOrder_When_GetOrderRouteCalled_And_AllBackendsSuccessful_Then_ResultIsSuccess() throws Exception {
-
-    // Verify mock expectations
-    MockEndpoint.expectsMessageCount(1);
-
-    var result = callTestRoute(RequestScenarios.GET_ORDER_SUCCESS);
-
-    // Verify mock expectations
-    MockEndpoint.assertIsSatisfied(camelContext);
-
-  }
-
-  private Exchange callTestRoute(String scenarioName) throws Exception {
-    Map<String, Object> headers = new HashMap<>();
-
-    // Create a valid Order object for testing
-    Order testOrder = getOrderByScenarioName(getOrderScenarios, scenarioName);
-
-    // Create an exchange with the necessary data
-    Exchange exchange = ExchangeBuilder.anExchange(camelContext).build();
-    exchange.getIn().setHeaders(headers);
-    exchange.getIn().setBody(testOrder);
-
-    return fluentProducerTemplate
-        .to("direct:centralGetOrder")
-        .withExchange(exchange)
+    var result = fluentProducerTemplate.to("direct:centralGetOrder")
+        .withHeader("applicationId", cached.getApplicationId())
         .send();
+
+    MockEndpoint.assertIsSatisfied(camelContext);
+    LoanApplication response = result.getMessage().getBody(LoanApplication.class);
+    assertThat(response.getApplicationId()).isEqualTo(cached.getApplicationId());
   }
 
+  @Test
+  @DisplayName("Cache miss + JPA hit: warms cache, returns JPA result")
+  void test_CacheMiss_JpaHit() throws Exception {
+    LoanApplication fromJpa = TestDataFactory.bureauApprovalInput();
+    AdviceWith.adviceWith(camelContext, "centralGetLoanApplicationRoute", a -> {
+      a.weaveById("getOrderCacheEndpoint").replace().process(e -> e.getIn().setBody(null)).to("mock:cacheRead");
+      a.weaveById("getOrderJpaEndpoint").replace().process(e -> e.getIn().setBody(fromJpa)).to("mock:jpaRead");
+      a.weaveById("cacheWarmOnMissEndpoint").replace().to("mock:cacheWarm");
+    });
+    camelContext.start();
+
+    mockCacheRead.expectedMessageCount(1);
+    mockJpaRead.expectedMessageCount(1);
+    mockCacheWarm.expectedMessageCount(1);
+
+    var result = fluentProducerTemplate.to("direct:centralGetOrder")
+        .withHeader("applicationId", fromJpa.getApplicationId())
+        .send();
+
+    MockEndpoint.assertIsSatisfied(camelContext);
+    LoanApplication response = result.getMessage().getBody(LoanApplication.class);
+    assertThat(response.getApplicationId()).isEqualTo(fromJpa.getApplicationId());
+  }
+
+  @Test
+  @DisplayName("Cache miss + JPA miss: throws DataNotFoundException")
+  void test_NotFound() throws Exception {
+    AdviceWith.adviceWith(camelContext, "centralGetLoanApplicationRoute", a -> {
+      a.weaveById("getOrderCacheEndpoint").replace().process(e -> e.getIn().setBody(null)).to("mock:cacheRead");
+      a.weaveById("getOrderJpaEndpoint").replace().process(e -> e.getIn().setBody(null)).to("mock:jpaRead");
+      a.weaveById("cacheWarmOnMissEndpoint").replace().to("mock:cacheWarm");
+    });
+    camelContext.start();
+
+    assertThatThrownBy(() -> fluentProducerTemplate.to("direct:centralGetOrder")
+        .withHeader("applicationId", "missing-id")
+        .request())
+        .hasRootCauseInstanceOf(DataNotFoundException.class);
+  }
 }

@@ -1,0 +1,21 @@
+{
+  "priority": 10,
+  "request": {
+    "method": "POST",
+    "url": "/credit-assessments"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "transformers": ["response-template"],
+    "jsonBody": {
+      "assessmentId": "ASSESS-{{randomValue length=10 type='UPPER_HEX'}}",
+      "approved": true,
+      "riskScore": 25,
+      "reason": "Credit profile acceptable",
+      "recommendedMaxAmount": 50000.00
+    }
+  }
+}

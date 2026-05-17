@@ -199,10 +199,11 @@
                 <useTags>true</useTags>
                 <oas3>true</oas3>
                 <useSpringBoot3>true</useSpringBoot3>
+                <openApiNullable>false</openApiNullable>
               </configOptions>
             </configuration>
           </execution>
-          
+
                     <execution>
             <id>generate-mcp-sources-api</id>
             <goals>
@@ -224,10 +225,11 @@
                 <useTags>true</useTags>
                 <oas3>true</oas3>
                 <useSpringBoot3>true</useSpringBoot3>
+                <openApiNullable>false</openApiNullable>
               </configOptions>
             </configuration>
           </execution>
-          
+
                     <!-- Microservice calls a backend REST api, we need to create model classes using the purchase-api.yaml  -->
           <execution>
             <id>generate-rest-sources-infra</id>
@@ -250,6 +252,7 @@
                 <useTags>true</useTags>
                 <oas3>true</oas3>
                 <useSpringBoot3>true</useSpringBoot3>
+                <openApiNullable>false</openApiNullable>
               </configOptions>
             </configuration>
           </execution>
@@ -272,17 +275,6 @@
             <phase>generate-sources</phase>
             <configuration>
               <sourceDirectory>${project.basedir}/src/main/resources/avro</sourceDirectory>
-              <outputDirectory>${project.build.directory}/generated-sources/avro</outputDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>generate-avro-sources-infra</id>
-            <goals>
-              <goal>schema</goal>
-            </goals>
-            <phase>generate-sources</phase>
-            <configuration>
-              <sourceDirectory>${project.basedir}/src/main/resources/backends/avro</sourceDirectory>
               <outputDirectory>${project.build.directory}/generated-sources/avro</outputDirectory>
             </configuration>
           </execution>

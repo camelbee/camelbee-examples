@@ -1,85 +1,164 @@
 openapi: 3.0.3
 info:
-  title: Order Schema for MCP Tools
-  description: Schema orders and their items
+  title: Loan Application Schema for MCP Tools
+  description: Schemas for loan application MCP tool calls
   version: 1.0.0
 paths: {}
 components:
   schemas:
-    # Order Domain Schemas - Main schemas used throughout
-    Order:
+    LoanPurpose:
+      type: string
+      enum:
+        - HOME_PURCHASE
+        - CAR_LOAN
+        - PERSONAL
+        - BUSINESS
+        - EDUCATION
+        - DEBT_CONSOLIDATION
+
+    EmploymentStatus:
+      type: string
+      enum:
+        - EMPLOYED
+        - SELF_EMPLOYED
+        - UNEMPLOYED
+        - RETIRED
+
+    ApplicationStatus:
+      type: string
+      enum:
+        - RECEIVED
+        - APPROVED
+        - REJECTED
+        - PENDING_REVIEW
+
+    LoanApplicationSubmissionRequest:
       type: object
       required:
-        - salesChannel
+        - applicantId
+        - applicantName
+        - applicantEmail
+        - requestedAmount
+        - purpose
+        - termMonths
+        - monthlyIncome
+        - creditScore
+        - employmentStatus
       properties:
-        id:
+        applicantId:
           type: string
-          description: Unique order identifier (server-generated for creates)
-          readOnly: true
-          example: "order-12345"
-        salesChannel:
+          example: "APP-001"
+        applicantName:
           type: string
-          description: Sales channel identifier
-          example: "mcp-agent"
+          example: "Jane Doe"
+        applicantEmail:
+          type: string
+          format: email
+          example: "jane.doe@example.com"
+        requestedAmount:
+          type: number
+          example: 25000.00
+        purpose:
+          $ref: '#/components/schemas/LoanPurpose'
+        termMonths:
+          type: integer
+          description: "Allowed values: 12, 24, 36, 48, 60"
+        monthlyIncome:
+          type: number
+          example: 5000.00
+        creditScore:
+          type: integer
+          minimum: 300
+          maximum: 850
+          example: 720
+        employmentStatus:
+          $ref: '#/components/schemas/EmploymentStatus'
+
+    LoanApplicationSubmissionResponse:
+      type: object
+      required:
+        - applicationId
+        - status
+        - submittedAt
+      properties:
+        applicationId:
+          type: string
+          format: uuid
         status:
-          type: string
-          enum:
-            - Pending
-            - Confirmed
-            - Processing
-            - Shipped
-            - Delivered
-            - Completed
-            - Canceled
-            - Returned
-            - Failed
-            - On Hold
-          description: Current order status
-        orderDate:
-          type: string
-          format: date
-          description: Order creation date (server-generated)
-          readOnly: true
-          example: "2025-07-02"
-        lastUpdateTimestamp:
+          $ref: '#/components/schemas/ApplicationStatus'
+        submittedAt:
           type: string
           format: date-time
-          description: Last update timestamp (server-managed)
-          readOnly: true
-          example: "2025-07-02T10:30:00Z"
-        items:
-          type: array
-          description: Array of order items
-          items:
-            $ref: '#/components/schemas/OrderItem'
-          minItems: 1
 
-    OrderItem:
+    LoanApplication:
       type: object
       required:
-        - productName
+        - applicationId
+        - applicantId
+        - applicantName
+        - applicantEmail
+        - requestedAmount
+        - purpose
+        - termMonths
+        - monthlyIncome
+        - creditScore
+        - employmentStatus
+        - status
+        - submittedAt
       properties:
-        id:
+        applicationId:
           type: string
-          description: Order item identifier (server-generated)
-          readOnly: true
-          example: "item-001"
-        productId:
+          format: uuid
+        applicantId:
           type: string
-          description: Product identifier
-          example: "p1"
-        productName:
+        applicantName:
           type: string
-          description: Product name
-          example: "Widget A"
-        quantity:
-          type: integer
-          minimum: 1
-          description: Quantity ordered
-          default: 1
-          example: 2
-        price:
+        applicantEmail:
+          type: string
+          format: email
+        requestedAmount:
           type: number
-          minimum: 0
-          description: Price per unit
-          example: 29.99
+        purpose:
+          $ref: '#/components/schemas/LoanPurpose'
+        termMonths:
+          type: integer
+        monthlyIncome:
+          type: number
+        creditScore:
+          type: integer
+        employmentStatus:
+          $ref: '#/components/schemas/EmploymentStatus'
+        status:
+          $ref: '#/components/schemas/ApplicationStatus'
+        riskScore:
+          type: integer
+          nullable: true
+        decisionReason:
+          type: string
+          nullable: true
+        submittedAt:
+          type: string
+          format: date-time
+        processedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    LoanApplicationPage:
+      type: object
+      required:
+        - applications
+        - totalItems
+        - page
+        - pageSize
+      properties:
+        applications:
+          type: array
+          items:
+            $ref: '#/components/schemas/LoanApplication'
+        totalItems:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer

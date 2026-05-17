@@ -1,16 +1,11 @@
 package io.fintech.loan.application.service.routes.producer.jpa;
 
 import io.fintech.loan.application.service.constants.Constants;
-import io.fintech.loan.application.service.mapper.infra.JpaPurchaseMapper;
-import io.fintech.loan.application.service.model.domain.Order;
-import io.fintech.loan.application.service.model.domain.OrderItem;
-import io.fintech.loan.application.service.model.infra.jpa.postgresql.Purchase;
-import io.fintech.loan.application.service.model.infra.jpa.postgresql.Purchase.StatusEnum;
-import io.fintech.loan.application.service.model.infra.jpa.postgresql.PurchaseItem;
+import io.fintech.loan.application.service.mapper.infra.JpaLoanApplicationMapper;
+import io.fintech.loan.application.service.model.domain.LoanApplication;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
@@ -18,18 +13,15 @@ import org.apache.camel.builder.RouteBuilder;
 import org.camelbee.config.CamelBeeRouteConfigurer;
 import org.springframework.stereotype.Component;
 
-/**
- * Jpa Producer Route.
- *
- * @author camelbee
- */
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class JpaProducerRoute extends RouteBuilder {
 
   final CamelBeeRouteConfigurer camelBeeRouteConfigurer;
-  final JpaPurchaseMapper jpaPurchaseMapper;
+  final JpaLoanApplicationMapper jpaMapper;
+
+  private static final String JPA_ENTITY = "jpa:io.fintech.loan.application.service.model.infra.jpa.postgresql.LoanApplication";
 
   @Override
   public void configure() throws Exception {
@@ -37,149 +29,107 @@ public class JpaProducerRoute extends RouteBuilder {
     camelBeeRouteConfigurer.configureRoute(this);
     errorHandler(noErrorHandler());
 
-    from("direct:createOrderJpa").routeId("createOrderJpaRoute")
-        .setBody(exchangeProperty(Constants.ORIGINAL_BODY))
-        .convertBodyTo(Purchase.class)
-        .to("jpa:io.fintech.loan.application.service.model.infra.jpa.postgresql.Purchase")
-        .convertBodyTo(Order.class)
-        .setProperty(Constants.ACTUAL_RESPONSE_BODY, body());
-
-    from("direct:updateOrderJpa").routeId("updateOrderJpaRoute")
-        .setBody(exchangeProperty(Constants.ORIGINAL_BODY))
-        .process(this::setJpaParametersFromOrder)
-        // First fetch the existing purchase using named query
-        .to("jpa:io.fintech.loan.application.service.model.infra.jpa.postgresql.Purchase?"
-            + "namedQuery=Purchase.findPurchaseBySalesChannelAndId&singleResult=true")
-        .process(this::updatePurchase)
-        .to("jpa:io.fintech.loan.application.service.model.infra.jpa.postgresql.Purchase")
-        .convertBodyTo(Order.class)
-        .setProperty(Constants.ACTUAL_RESPONSE_BODY, body());
-
-    // CPD-OFF
-    from("direct:listOrdersJpa").routeId("listOrdersJpaRoute")
+    // INSERT — used by CRO. Body is domain LoanApplication on entry.
+    from("direct:createOrderJpa").routeId("createLoanApplicationJpaRoute")
         .setBody(exchangeProperty(Constants.ORIGINAL_BODY))
         .process(e -> {
-          // Set query parameters
+          LoanApplication app = e.getIn().getBody(LoanApplication.class);
+          e.getIn().setBody(jpaMapper.domainToJpa(app));
+        })
+        .to(JPA_ENTITY)
+        .process(e -> {
+          var entity = e.getIn().getBody(
+              io.fintech.loan.application.service.model.infra.jpa.postgresql.LoanApplication.class);
+          e.getIn().setBody(jpaMapper.jpaToDomain(entity));
+        })
+        .setProperty(Constants.ACTUAL_RESPONSE_BODY, body());
+
+    // UPDATE — used by UPO. Body is the (already-modified) domain LoanApplication.
+    from("direct:updateOrderJpa").routeId("updateLoanApplicationJpaRoute")
+        .setBody(exchangeProperty(Constants.ORIGINAL_BODY))
+        .process(e -> {
+          LoanApplication app = e.getIn().getBody(LoanApplication.class);
           Map<String, Object> params = new HashMap<>();
-          params.put("salesChannel", e.getIn().getHeader("salesChannel"));
+          params.put("applicationId", app.getApplicationId());
           e.getIn().setHeader("CamelJpaParameters", params);
+          e.setProperty("incomingApplication", app);
         })
-        // Get total count using named query
-        .to("jpa:io.fintech.loan.application.service.model.infra.jpa.postgresql.Purchase?"
-            + "namedQuery=Purchase.countPurchasesBySalesChannel&singleResult=true")
-        .setProperty("totalPurchases", body())
-        .process(exchange -> {
-          int page = exchange.getIn().getHeader("page", Integer.class);
-          int pageSize = exchange.getIn().getHeader("pageSize", Integer.class);
-          int offset = (page - 1) * pageSize;
-
-          // Set JPA pagination headers
-          exchange.getIn().setHeader("CamelJpaFirstResult", offset);
-          exchange.getIn().setHeader("CamelJpaMaximumResults", pageSize);
-        })
-        // Fetch paginated purchases using named query
-        .to("jpa:io.fintech.loan.application.service.model.infra.jpa.postgresql.Purchase?"
-            + "namedQuery=Purchase.findPurchasesBySalesChannel")
+        .to(JPA_ENTITY + "?namedQuery=LoanApplication.findByApplicationId&singleResult=true")
         .process(e -> {
-          e.getIn().setBody(jpaPurchaseMapper.jpaPurchasesToDomainOrders((List<Purchase>) e.getIn().getBody()));
-
-          e.getIn().setHeader("currentPage", e.getIn().getHeader("page"));
-          e.getIn().setHeader("totalOrders", e.getProperty("totalPurchases"));
-
-          int pageSize = e.getIn().getHeader("pageSize", Integer.class);
-          long totalPurchases = e.getProperty("totalPurchases", Long.class);
-          long totalPages = (totalPurchases + pageSize - 1) / pageSize;
-
-          e.getIn().setHeader("totalPages", totalPages);
+          var entity = e.getIn().getBody(
+              io.fintech.loan.application.service.model.infra.jpa.postgresql.LoanApplication.class);
+          LoanApplication updated = e.getProperty("incomingApplication", LoanApplication.class);
+          entity.setStatus(updated.getStatus() == null ? entity.getStatus() : updated.getStatus().name());
+          entity.setRiskScore(updated.getRiskScore() != null ? updated.getRiskScore() : entity.getRiskScore());
+          entity.setDecisionReason(updated.getDecisionReason() != null ? updated.getDecisionReason() : entity.getDecisionReason());
+          entity.setProcessedAt(updated.getProcessedAt() != null ? updated.getProcessedAt() : entity.getProcessedAt());
+          e.getIn().setBody(entity);
+        })
+        .to(JPA_ENTITY)
+        .process(e -> {
+          var entity = e.getIn().getBody(
+              io.fintech.loan.application.service.model.infra.jpa.postgresql.LoanApplication.class);
+          e.getIn().setBody(jpaMapper.jpaToDomain(entity));
         })
         .setProperty(Constants.ACTUAL_RESPONSE_BODY, body());
 
-    // CPD-OFF
-    from("direct:getOrderJpa").routeId("getOrderJpaRoute")
-        .setBody(exchangeProperty(Constants.ORIGINAL_BODY))
-        .process(this::setJpaParametersFromHeaders)
-        // Fetch purchase using named query
-        .to("jpa:io.fintech.loan.application.service.model.infra.jpa.postgresql.Purchase?persistenceUnit=mariadb&"
-            + "namedQuery=Purchase.findPurchaseBySalesChannelAndId&singleResult=true")
-        .convertBodyTo(Order.class)
-        .setProperty(Constants.ACTUAL_RESPONSE_BODY, body());
+    // GET by applicationId — used by cache-aside GEO.
+    from("direct:getOrderJpa").routeId("getLoanApplicationJpaRoute")
+        .process(this::setApplicationIdParam)
+        .to(JPA_ENTITY + "?namedQuery=LoanApplication.findByApplicationId&singleResult=true")
+        .process(e -> {
+          var entity = e.getIn().getBody(
+              io.fintech.loan.application.service.model.infra.jpa.postgresql.LoanApplication.class);
+          e.getIn().setBody(entity == null ? null : jpaMapper.jpaToDomain(entity));
+        });
 
+    // LIST with optional status filter, paginated.
+    from("direct:listOrdersJpa").routeId("listLoanApplicationsJpaRoute")
+        .process(this::setListQueryParams)
+        .choice()
+        .when(header("status").isNotNull())
+        .to(JPA_ENTITY + "?namedQuery=LoanApplication.countByStatus&singleResult=true")
+        .otherwise()
+        .to(JPA_ENTITY + "?namedQuery=LoanApplication.countAll&singleResult=true")
+        .end()
+        .setHeader("totalItems", body())
+        .process(this::setPaginationHeaders)
+        .choice()
+        .when(header("status").isNotNull())
+        .to(JPA_ENTITY + "?namedQuery=LoanApplication.findByStatus")
+        .otherwise()
+        .to(JPA_ENTITY + "?namedQuery=LoanApplication.findAll")
+        .end()
+        .process(e -> {
+          @SuppressWarnings("unchecked")
+          List<io.fintech.loan.application.service.model.infra.jpa.postgresql.LoanApplication> entities = (List<io.fintech.loan.application.service.model.infra.jpa.postgresql.LoanApplication>) e
+              .getIn().getBody();
+          e.getIn().setBody(jpaMapper.jpaToDomainList(entities));
+          Number total = e.getIn().getHeader("totalItems", Number.class);
+          e.getIn().setHeader("totalItems", total == null ? 0 : total.intValue());
+        });
   }
 
-  private void setJpaParametersFromOrder(Exchange exchange) {
-
-    // Set query parameters
+  private void setApplicationIdParam(Exchange exchange) {
     Map<String, Object> params = new HashMap<>();
-    params.put("salesChannel", exchange.getIn().getBody(Order.class).getSalesChannel());
-    params.put("id", exchange.getIn().getBody(Order.class).getId());
+    params.put("applicationId", exchange.getIn().getHeader("applicationId"));
     exchange.getIn().setHeader("CamelJpaParameters", params);
   }
 
-  private void setJpaParametersFromHeaders(Exchange exchange) {
-
-    // Set query parameters
-    Map<String, Object> params = new HashMap<>();
-    params.put("salesChannel", exchange.getIn().getHeader("salesChannel"));
-    params.put("id", exchange.getIn().getHeader("id"));
-    exchange.getIn().setHeader("CamelJpaParameters", params);
+  private void setListQueryParams(Exchange exchange) {
+    String status = exchange.getIn().getHeader("status", String.class);
+    if (status != null && !status.isBlank()) {
+      Map<String, Object> params = new HashMap<>();
+      params.put("status", status);
+      exchange.getIn().setHeader("CamelJpaParameters", params);
+    }
   }
 
-  private void updatePurchase(Exchange exchange) {
-    Purchase existingPurchase = exchange.getIn().getBody(Purchase.class);
-    Order updatedOrder = exchange.getProperty(Constants.ORIGINAL_BODY, Order.class);
-
-    // Update only the changed fields (PATCH behavior)
-    if (updatedOrder.getStatus() != null) {
-      existingPurchase.setStatus(StatusEnum.fromValue(updatedOrder.getStatus().getValue()));
-    }
-
-    if (updatedOrder.getOrderDate() != null) {
-      existingPurchase.setPurchaseDate(updatedOrder.getOrderDate());
-    }
-    if (updatedOrder.getLastUpdateTimestamp() != null) {
-      existingPurchase.setLastUpdateTimestamp(updatedOrder.getLastUpdateTimestamp().toLocalDateTime());
-    }
-
-    // Update items if provided
-    if (updatedOrder.getItems() != null && !updatedOrder.getItems().isEmpty()) {
-      // Update existing items and add new ones
-      for (OrderItem updatedItem : updatedOrder.getItems()) {
-
-        // check if the supplied id is numeric
-        Long purchaseId = Optional.ofNullable(updatedItem.getId())
-            .filter(id -> id.matches("\\d+"))
-            .map(Long::parseLong)
-            .orElse(-1L);
-
-        PurchaseItem existingItem = existingPurchase.getItems().stream()
-            .filter(item -> purchaseId.equals(item.getId()))
-            .findFirst()
-            .orElse(null);
-
-        if (existingItem != null) {
-          // Update existing item only if new values are provided
-          if (updatedItem.getProductName() != null) {
-            existingItem.setProductName(updatedItem.getProductName());
-          }
-          if (updatedItem.getProductId() != null) {
-            existingItem.setProductId(updatedItem.getProductId());
-          }
-          if (updatedItem.getPrice() != null) {
-            existingItem.setPrice(updatedItem.getPrice());
-          }
-          if (updatedItem.getQuantity() != null) {
-            existingItem.setQuantity(updatedItem.getQuantity());
-          }
-        } else {
-          PurchaseItem purchaseItem = jpaPurchaseMapper.domainOrderItemToJsonPurchaseItem(updatedItem);
-          purchaseItem.setPurchase(existingPurchase);
-          // Add new item
-          existingPurchase.getItems().add(purchaseItem);
-        }
-      }
-    }
-
-    exchange.getIn().setBody(existingPurchase);
+  private void setPaginationHeaders(Exchange exchange) {
+    int page = exchange.getIn().getHeader("page", 0, Integer.class);
+    int pageSize = exchange.getIn().getHeader("pageSize", 10, Integer.class);
+    int offset = page * pageSize;
+    exchange.getIn().setHeader("CamelJpaFirstResult", offset);
+    exchange.getIn().setHeader("CamelJpaMaximumResults", pageSize);
   }
-
 }

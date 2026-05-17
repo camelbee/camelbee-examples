@@ -1,107 +1,71 @@
 package io.fintech.loan.application.service.routes.central;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import io.fintech.loan.application.service.model.domain.Order;
+import io.fintech.loan.application.service.model.domain.ApplicationStatus;
+import io.fintech.loan.application.service.model.domain.LoanApplication;
 import io.fintech.loan.application.service.routes.UnitTest;
-import io.fintech.loan.application.service.utils.testdata.CreateOrderDomainTestDataProducer;
-import io.fintech.loan.application.service.utils.testdata.CreateOrderDomainTestDataProducer.RequestScenarios;
-import io.fintech.loan.application.service.utils.testdata.RequestResponseScenario;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import io.fintech.loan.application.service.utils.TestDataFactory;
 import org.apache.camel.EndpointInject;
-import org.apache.camel.Exchange;
 import org.apache.camel.ValidationException;
 import org.apache.camel.builder.AdviceWith;
-import org.apache.camel.builder.ExchangeBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.camelbee.config.CamelBeeRouteConfigurer;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-/**
- * Unit Test for testing sunny and rainy day scenarios for the Ubuy Rest backend
- * in the Order Route.
- *
- * @author camelbee
- *
- */
-@SpringBootTest(classes = {
-    CentralCreateOrderRoute.class,
-    CamelBeeRouteConfigurer.class
-})
+@DisplayName("CentralCreateLoanApplicationRoute")
 class CentralCreateOrderRouteUnitTest extends UnitTest {
 
-  @EndpointInject(value = "mock:createOrderJpaEndpoint")
-  protected MockEndpoint mockCreateOrderJpaEndpoint;
+  @EndpointInject("mock:createOrderJpa")
+  protected MockEndpoint mockJpa;
 
-  @EndpointInject(value = "mock:createOrderKafkaEndpoint")
-  protected MockEndpoint mockCreateOrderKafkaEndpoint;
+  @EndpointInject("mock:createOrderCache")
+  protected MockEndpoint mockCache;
 
-  @EndpointInject(value = "mock:createOrderCacheEndpoint")
-  protected MockEndpoint mockCreateOrderCacheEndpoint;
-
-  private final List<RequestResponseScenario> createOrderScenarios = CreateOrderDomainTestDataProducer.generateCreateOrderRequests();
+  @EndpointInject("mock:createOrderKafka")
+  protected MockEndpoint mockKafka;
 
   @BeforeEach
-  public void setup() throws Exception {
-
-    AdviceWith.adviceWith(camelContext, "centralCreateOrderRoute", a -> {
-      a.weaveById("createOrderJpaEndpoint").replace().to("mock:createOrderJpaEndpoint");
-      a.weaveById("createOrderKafkaEndpoint").replace().to("mock:createOrderKafkaEndpoint");
-      a.weaveById("createOrderCacheEndpoint").replace().to("mock:createOrderCacheEndpoint");
+  void setUp() throws Exception {
+    AdviceWith.adviceWith(camelContext, "centralCreateLoanApplicationRoute", a -> {
+      a.weaveById("createOrderJpaEndpoint").replace().to("mock:createOrderJpa");
+      a.weaveById("createOrderCacheEndpoint").replace().to("mock:createOrderCache");
+      a.weaveById("createOrderKafkaEndpoint").replace().to("mock:createOrderKafka");
     });
-
     camelContext.start();
   }
 
   @Test
-  @org.junit.jupiter.api.Order(1)
-  void given_InvalidOrder_When_CreateOrderRouteCalled_And_ValidationFailed_Then_ResultIsValidationError() throws Exception {
+  @DisplayName("Success: generates applicationId, sets RECEIVED, fans out to all backends")
+  void test_CreateLoanApplication_Success() throws Exception {
+    mockJpa.expectedMessageCount(1);
+    mockCache.expectedMessageCount(1);
+    mockKafka.expectedMessageCount(1);
 
-    // Verify mock expectations
-    MockEndpoint.expectsMessageCount(0);
+    LoanApplication input = TestDataFactory.submissionInput();
 
-    var result = callTestRoute(RequestScenarios.CREATE_ORDER_ERROR_NO_ITEMS);
+    var result = fluentProducerTemplate.to("direct:centralCreateOrder")
+        .withBody(input)
+        .send();
 
-    // Verify result
-    assertThat(result.getException()).isInstanceOf(ValidationException.class);
-
-    // Verify mock expectations
     MockEndpoint.assertIsSatisfied(camelContext);
-
+    LoanApplication response = result.getMessage().getBody(LoanApplication.class);
+    assertThat(response.getApplicationId()).isNotBlank();
+    assertThat(response.getStatus()).isEqualTo(ApplicationStatus.RECEIVED);
+    assertThat(response.getSubmittedAt()).isNotNull();
   }
 
   @Test
-  @org.junit.jupiter.api.Order(2)
-  void given_ValidOrder_When_CreateOrderRouteCalled_And_AllBackendsSuccessful_Then_ResultIsSuccess() throws Exception {
+  @DisplayName("Error: missing applicantId triggers ValidationException")
+  void test_CreateLoanApplication_ValidationError_MissingApplicantId() {
+    LoanApplication invalid = TestDataFactory.submissionInput();
+    invalid.setApplicantId(null);
 
-    // Verify mock expectations
-    MockEndpoint.expectsMessageCount(1);
-
-    var result = callTestRoute(RequestScenarios.CREATE_ORDER_SUCCESS);
-
-    // Verify mock expectations
-    MockEndpoint.assertIsSatisfied(camelContext);
-
-  }
-
-  private Exchange callTestRoute(String scenarioName) throws Exception {
-    Map<String, Object> headers = new HashMap<>();
-
-    // Create a valid Order object for testing
-    Order testOrder = getOrderByScenarioName(createOrderScenarios, scenarioName);
-
-    // Create an exchange with the necessary data
-    Exchange exchange = ExchangeBuilder.anExchange(camelContext).build();
-    exchange.getIn().setHeaders(headers);
-    exchange.getIn().setBody(testOrder);
-
-    return fluentProducerTemplate
-        .to("direct:centralCreateOrder")
-        .withExchange(exchange)
-        .send();
+    assertThatThrownBy(() -> fluentProducerTemplate.to("direct:centralCreateOrder")
+        .withBody(invalid)
+        .request())
+        .hasRootCauseInstanceOf(ValidationException.class);
   }
 }

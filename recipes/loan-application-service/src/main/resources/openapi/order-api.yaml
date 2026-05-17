@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: Order Service API
-  description: API for managing orders and their items
+  title: Loan Application Service API
+  description: API for submitting and tracking loan applications
   version: 1.0.0
 servers:
   - url: "{scheme}://{host}/{basePath}"
@@ -12,13 +12,13 @@ servers:
           - "http"
         default: "https"
       host:
-        default: "camelbee.io"
+        default: "fintech.io"
       basePath:
         default: "/camelbee-service"
 paths:
-  /orders:
+  /loan-applications:
     get:
-      summary: List all orders
+      summary: List loan applications, optionally filtered by status
       operationId: listOrders
       parameters:
         - name: transactionId
@@ -33,18 +33,18 @@ paths:
           schema:
             type: string
             format: uuid
-        - name: salesChannel
+        - name: status
           in: query
-          required: true
+          required: false
           schema:
-            type: string
+            $ref: '#/components/schemas/ApplicationStatus'
         - name: page
           in: query
           required: false
           schema:
             type: integer
-            minimum: 1
-            default: 1
+            minimum: 0
+            default: 0
         - name: pageSize
           in: query
           required: false
@@ -52,16 +52,10 @@ paths:
             type: integer
             minimum: 1
             maximum: 100
-            default: 20
-        - name: cursor
-          in: query
-          required: false
-          description: Cursor token for NoSQL backends pagination. Pass the nextCursor value from a previous response to fetch the next page.
-          schema:
-            type: string
+            default: 10
       responses:
         '200':
-          description: A list of orders
+          description: A page of loan applications
           headers:
             transactionId:
               description: Transaction ID
@@ -73,28 +67,10 @@ paths:
               schema:
                 type: string
                 format: uuid
-            currentPage:
-              description: The current page number
-              schema:
-                type: integer
-            totalPages:
-              description: The total number of pages available
-              schema:
-                type: integer
-            totalOrders:
-              description: The total number of items
-              schema:
-                type: integer
-            nextCursor:
-              description: Cursor token for fetching the next page of results (NoSQL backends). Absent or empty when there are no more pages.
-              schema:
-                type: string
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/LoanApplicationPage'
         '400':
           description: Bad Request
           headers:
@@ -130,7 +106,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      summary: Create an order
+      summary: Submit a new loan application for async processing
       operationId: createOrder
       parameters:
         - name: transactionId
@@ -146,15 +122,15 @@ paths:
             type: string
             format: uuid
       requestBody:
-        description: Order to add
+        description: Loan application to submit
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Order'
+              $ref: '#/components/schemas/LoanApplicationSubmissionRequest'
       responses:
-        '201':
-          description: Order created
+        '202':
+          description: Loan application accepted for processing
           headers:
             transactionId:
               description: Transaction ID
@@ -169,7 +145,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/LoanApplicationSubmissionResponse'
         '400':
           description: Bad Request
           headers:
@@ -204,21 +180,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /orders/{id}:
+  /loan-applications/{applicationId}:
     get:
-      summary: Get an order by ID
+      summary: Get a loan application by ID
       operationId: getOrder
       parameters:
-        - name: id
+        - name: applicationId
           in: path
           required: true
           schema:
             type: string
-        - name: salesChannel
-          in: query
-          required: true
-          schema:
-            type: string
+            format: uuid
         - name: transactionId
           in: header
           required: true
@@ -231,10 +203,9 @@ paths:
           schema:
             type: string
             format: uuid
-
       responses:
         '200':
-          description: An order
+          description: A loan application
           headers:
             transactionId:
               description: Transaction ID
@@ -249,7 +220,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/LoanApplication'
         '400':
           description: Bad Request
           headers:
@@ -268,7 +239,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '404':
-          description: Order not found
+          description: Loan application not found
           headers:
             transactionId:
               description: Transaction ID
@@ -303,57 +274,160 @@ paths:
                 $ref: '#/components/schemas/Error'
 components:
   schemas:
-    Order:
+    LoanPurpose:
+      type: string
+      enum:
+        - HOME_PURCHASE
+        - CAR_LOAN
+        - PERSONAL
+        - BUSINESS
+        - EDUCATION
+        - DEBT_CONSOLIDATION
+
+    EmploymentStatus:
+      type: string
+      enum:
+        - EMPLOYED
+        - SELF_EMPLOYED
+        - UNEMPLOYED
+        - RETIRED
+
+    ApplicationStatus:
+      type: string
+      enum:
+        - RECEIVED
+        - APPROVED
+        - REJECTED
+        - PENDING_REVIEW
+
+    LoanApplicationSubmissionRequest:
       type: object
       required:
-        - salesChannel
+        - applicantId
+        - applicantName
+        - applicantEmail
+        - requestedAmount
+        - purpose
+        - termMonths
+        - monthlyIncome
+        - creditScore
+        - employmentStatus
       properties:
-        id:
+        applicantId:
           type: string
-        salesChannel:
+        applicantName:
           type: string
+        applicantEmail:
+          type: string
+          format: email
+        requestedAmount:
+          type: number
+        purpose:
+          $ref: '#/components/schemas/LoanPurpose'
+        termMonths:
+          type: integer
+          description: "Allowed values: 12, 24, 36, 48, 60"
+        monthlyIncome:
+          type: number
+        creditScore:
+          type: integer
+          minimum: 300
+          maximum: 850
+        employmentStatus:
+          $ref: '#/components/schemas/EmploymentStatus'
+
+    LoanApplicationSubmissionResponse:
+      type: object
+      required:
+        - applicationId
+        - status
+        - submittedAt
+      properties:
+        applicationId:
+          type: string
+          format: uuid
         status:
+          $ref: '#/components/schemas/ApplicationStatus'
+        submittedAt:
           type: string
-          enum:
-            - Pending
-            - Confirmed
-            - Processing
-            - Shipped
-            - Delivered
-            - Completed
-            - Canceled
-            - Returned
-            - Failed
-            - On Hold
-          description: The status of an order
-        orderDate:
-          type: string
-          description:  Date format is ISO-8601 format (yyyy-MM-dd)
-          format: date
-        lastUpdateTimestamp:
-          type: string
-          description: Timestamp in ISO-8601 format (yyyy-MM-ddTHH:mm:ssZ)
           format: date-time
-        items:
+
+    LoanApplication:
+      type: object
+      required:
+        - applicationId
+        - applicantId
+        - applicantName
+        - applicantEmail
+        - requestedAmount
+        - purpose
+        - termMonths
+        - monthlyIncome
+        - creditScore
+        - employmentStatus
+        - status
+        - submittedAt
+      properties:
+        applicationId:
+          type: string
+          format: uuid
+        applicantId:
+          type: string
+        applicantName:
+          type: string
+        applicantEmail:
+          type: string
+          format: email
+        requestedAmount:
+          type: number
+        purpose:
+          $ref: '#/components/schemas/LoanPurpose'
+        termMonths:
+          type: integer
+        monthlyIncome:
+          type: number
+        creditScore:
+          type: integer
+          minimum: 300
+          maximum: 850
+        employmentStatus:
+          $ref: '#/components/schemas/EmploymentStatus'
+        status:
+          $ref: '#/components/schemas/ApplicationStatus'
+        riskScore:
+          type: integer
+          minimum: 0
+          maximum: 100
+          nullable: true
+        decisionReason:
+          type: string
+          nullable: true
+        submittedAt:
+          type: string
+          format: date-time
+        processedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    LoanApplicationPage:
+      type: object
+      required:
+        - applications
+        - totalItems
+        - page
+        - pageSize
+      properties:
+        applications:
           type: array
           items:
-            $ref: '#/components/schemas/OrderItem'
-
-    OrderItem:
-      type: object
-      required:
-        - productName
-      properties:
-        id:
-          type: string
-        productId:
-          type: string
-        productName:
-          type: string
-        quantity:
+            $ref: '#/components/schemas/LoanApplication'
+        totalItems:
           type: integer
-        price:
-          type: number
+        page:
+          type: integer
+        pageSize:
+          type: integer
 
     Error:
       type: object
@@ -362,13 +436,3 @@ components:
           type: string
         message:
           type: string
-
-    Orders:
-      type: object
-      description: A wrapper for a list of orders
-      properties:
-        order:
-          type: array
-          items:
-            $ref: '#/components/schemas/Order'
-

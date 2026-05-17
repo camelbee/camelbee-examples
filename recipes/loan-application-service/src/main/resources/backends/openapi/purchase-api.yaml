@@ -1,19 +1,14 @@
 openapi: 3.0.1
 info:
-  title: Purchase Service API
-  description: API for managing purchases and their items
+  title: Credit Bureau API
+  description: External credit assessment service contract used by the loan-application service
   version: 1.0.0
 paths:
-  /camelbee-service/purchases/{id}:
-    patch:
-      summary: Update an purchase by ID
-      operationId: updatePurchase
+  /credit-assessments:
+    post:
+      summary: Run a credit assessment for an applicant
+      operationId: createCreditAssessment
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
         - name: transactionId
           in: header
           required: true
@@ -27,15 +22,15 @@ paths:
             type: string
             format: uuid
       requestBody:
-        description: Purchase to update
+        description: Credit assessment request
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Purchase'
+              $ref: '#/components/schemas/CreditAssessmentRequest'
       responses:
         '200':
-          description: Purchase updated
+          description: Assessment completed
           headers:
             transactionId:
               description: Transaction ID
@@ -50,111 +45,77 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Purchase'
+                $ref: '#/components/schemas/CreditAssessmentResult'
         '400':
           description: Bad Request
-          headers:
-            transactionId:
-              description: Transaction ID
-              schema:
-                type: string
-                format: uuid
-            requestId:
-              description: Request ID
-              schema:
-                type: string
-                format: uuid
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Purchase not found
-          headers:
-            transactionId:
-              description: Transaction ID
-              schema:
-                type: string
-                format: uuid
-            requestId:
-              description: Request ID
-              schema:
-                type: string
-                format: uuid
+        '503':
+          description: Credit bureau temporarily unavailable
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
           description: Internal Server Error
-          headers:
-            transactionId:
-              description: Transaction ID
-              schema:
-                type: string
-                format: uuid
-            requestId:
-              description: Request ID
-              schema:
-                type: string
-                format: uuid
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
 components:
   schemas:
-    Purchase:
-      type: object
-      required:
-        - salesChannel
-        - items
-      properties:
-        id:
-          type: string
-        salesChannel:
-          type: string
-        status:
-          type: string
-          enum:
-            - Pending
-            - Confirmed
-            - Processing
-            - Shipped
-            - Delivered
-            - Completed
-            - Canceled
-            - Returned
-            - Failed
-            - On Hold
-          description: The status of an purchase
-        purchaseDate:
-          type: string
-          description: Date format is ISO-8601 format (yyyy-MM-dd)
-          format: date
-        lastUpdateTimestamp:
-          type: string
-          description: Timestamp in ISO-8601 format (yyyy-MM-ddTHH:mm:ssZ)
-          format: date-time
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/PurchaseItem'
+    EmploymentStatus:
+      type: string
+      enum:
+        - EMPLOYED
+        - SELF_EMPLOYED
+        - UNEMPLOYED
+        - RETIRED
 
-    PurchaseItem:
+    CreditAssessmentRequest:
       type: object
       required:
-        - productName
+        - applicantId
+        - requestedAmount
+        - creditScore
+        - monthlyIncome
+        - employmentStatus
       properties:
-        id:
+        applicantId:
           type: string
-        productId:
-          type: string
-        productName:
-          type: string
-        quantity:
+        requestedAmount:
+          type: number
+        creditScore:
           type: integer
-        price:
+          minimum: 300
+          maximum: 850
+        monthlyIncome:
+          type: number
+        employmentStatus:
+          $ref: '#/components/schemas/EmploymentStatus'
+
+    CreditAssessmentResult:
+      type: object
+      required:
+        - assessmentId
+        - approved
+        - riskScore
+        - reason
+        - recommendedMaxAmount
+      properties:
+        assessmentId:
+          type: string
+        approved:
+          type: boolean
+        riskScore:
+          type: integer
+          minimum: 0
+          maximum: 100
+        reason:
+          type: string
+        recommendedMaxAmount:
           type: number
 
     Error:
@@ -164,12 +125,3 @@ components:
           type: string
         message:
           type: string
-
-    Purchases:
-      type: object
-      description: A wrapper for a list of purchases
-      properties:
-        purchase:
-          type: array
-          items:
-            $ref: '#/components/schemas/Purchase'

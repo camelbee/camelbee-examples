@@ -1,9 +1,8 @@
 package io.fintech.loan.application.service.routes.producer.cache;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fintech.loan.application.service.constants.Constants;
-import io.fintech.loan.application.service.model.domain.Order;
-import io.fintech.loan.application.service.model.infra.cache.Purchase;
-import io.fintech.loan.application.service.model.infra.cache.PurchaseItem;
+import io.fintech.loan.application.service.model.domain.LoanApplication;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
@@ -13,42 +12,21 @@ import org.camelbee.config.CamelBeeRouteConfigurer;
 import org.springframework.stereotype.Component;
 
 /**
- * Cache Producer Route — write-through cache (CRO/REO/UPO/DEO only).
- *
- * <p>CACHE is a write-through backend: it keeps the cache in sync with primary-backend writes.
- * GEO and LSO are intentionally NOT supported — those are cache-aside / read-through patterns
- * that require conditional routing (check cache first, fall back to backend on miss) and do not
- * fit the fan-out architecture where all backends are called for every operation.
- *
- * @author camelbee
+ * Cache producer routes — Redis write-through for CRO and UPO, plus an
+ * explicit GET path so the cache-aside flow in CentralGetOrderRoute renders
+ * as distinct nodes in the CamelBee topology.
  */
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class CacheProducerRoute extends RouteBuilder {
 
+  private static final String CACHE_KEY_PREFIX = "loanapplicationservice:loan-application:";
+  private static final long TTL_SECONDS = 3600L;
+  private static final String REDIS_ENDPOINT = "spring-redis://{{camelbeeservice.cache.host}}:{{camelbeeservice.cache.port}}?redisTemplate=#stringRedisTemplate";
+
   final CamelBeeRouteConfigurer camelBeeRouteConfigurer;
-
-  private static final String CACHE_KEY_PREFIX = "camelbeeservice:purchase:";
-
-  private void setCachePutHeaders(Exchange e, String key, String jsonValue) {
-    e.getIn().setHeader(RedisConstants.COMMAND, "SET");
-    e.getIn().setHeader(RedisConstants.KEY, key);
-    e.getIn().setHeader(RedisConstants.VALUE, jsonValue);
-  }
-
-  private void ensureIds(Purchase p) {
-    if (p.getId() == null || p.getId().isEmpty()) {
-      p.setId(java.util.UUID.randomUUID().toString());
-    }
-    if (p.getItems() != null) {
-      for (PurchaseItem pi : p.getItems()) {
-        if (pi.getId() == null || pi.getId().isEmpty()) {
-          pi.setId(java.util.UUID.randomUUID().toString());
-        }
-      }
-    }
-  }
+  final ObjectMapper objectMapper;
 
   @Override
   public void configure() throws Exception {
@@ -56,41 +34,55 @@ public class CacheProducerRoute extends RouteBuilder {
     camelBeeRouteConfigurer.configureRoute(this);
     errorHandler(noErrorHandler());
 
-    // CPD-OFF
-    from("direct:createOrderCache").routeId("createOrderCacheRoute")
-        .setBody(exchangeProperty(Constants.ORIGINAL_BODY))
-        .convertBodyTo(Purchase.class)
+    // Shared write path used by CRO/UPO and by the cache-aside warm-on-miss flow.
+    from("direct:loanApplicationCacheWrite").routeId("loanApplicationCacheWriteRoute")
         .process(e -> {
-          Purchase p = e.getIn().getBody(Purchase.class);
-          ensureIds(p);
-          e.setProperty("cachedPurchase", p);
+          LoanApplication app = e.getIn().getBody(LoanApplication.class);
+          String json = objectMapper.writeValueAsString(app);
+          e.getIn().setHeader(RedisConstants.COMMAND, "SETEX");
+          e.getIn().setHeader(RedisConstants.KEY, CACHE_KEY_PREFIX + app.getApplicationId());
+          e.getIn().setHeader(RedisConstants.VALUE, json);
+          e.getIn().setHeader(RedisConstants.TIMEOUT, TTL_SECONDS);
         })
-        .marshal().json().process(e -> {
-          Purchase p = e.getProperty("cachedPurchase", Purchase.class);
-          setCachePutHeaders(e, CACHE_KEY_PREFIX + p.getId(), e.getIn().getBody(String.class));
-        })
-        .to("spring-redis://{{camelbeeservice.cache.host}}:{{camelbeeservice.cache.port}}?redisTemplate=#stringRedisTemplate")
-        .process(e -> e.getIn().setBody(e.getProperty("cachedPurchase", Purchase.class)))
-        .convertBodyTo(Order.class)
-        .setProperty(Constants.ACTUAL_RESPONSE_BODY, body());
+        .to(REDIS_ENDPOINT);
 
-    from("direct:updateOrderCache").routeId("updateOrderCacheRoute")
+    // CRO — write cache after JPA insert.
+    from("direct:createOrderCache").routeId("createLoanApplicationCacheRoute")
         .setBody(exchangeProperty(Constants.ORIGINAL_BODY))
-        .convertBodyTo(Purchase.class)
-        .process(e -> {
-          Purchase p = e.getIn().getBody(Purchase.class);
-          ensureIds(p);
-          e.setProperty("cachedPurchase", p);
-        })
-        .marshal().json().process(e -> {
-          Purchase p = e.getProperty("cachedPurchase", Purchase.class);
-          setCachePutHeaders(e, CACHE_KEY_PREFIX + p.getId(), e.getIn().getBody(String.class));
-        })
-        .to("spring-redis://{{camelbeeservice.cache.host}}:{{camelbeeservice.cache.port}}?redisTemplate=#stringRedisTemplate")
-        .process(e -> e.getIn().setBody(e.getProperty("cachedPurchase", Purchase.class)))
-        .convertBodyTo(Order.class)
-        .setProperty(Constants.ACTUAL_RESPONSE_BODY, body());
+        .to("direct:loanApplicationCacheWrite").id("cacheWriteOnCreateEndpoint")
+        .setProperty(Constants.ACTUAL_RESPONSE_BODY, exchangeProperty(Constants.ORIGINAL_BODY))
+        .setBody(exchangeProperty(Constants.ORIGINAL_BODY));
 
+    // UPO — overwrite cache after JPA update.
+    from("direct:updateOrderCache").routeId("updateLoanApplicationCacheRoute")
+        .setBody(exchangeProperty(Constants.ORIGINAL_BODY))
+        .to("direct:loanApplicationCacheWrite").id("cacheWriteOnUpdateEndpoint")
+        .setProperty(Constants.ACTUAL_RESPONSE_BODY, exchangeProperty(Constants.ORIGINAL_BODY))
+        .setBody(exchangeProperty(Constants.ORIGINAL_BODY));
+
+    // GEO step 1 — Redis read. Body becomes the cached LoanApplication or null.
+    from("direct:getOrderCache").routeId("getLoanApplicationCacheRoute")
+        .process(this::redisGetHeaders)
+        .to(REDIS_ENDPOINT)
+        .process(e -> {
+          Object body = e.getIn().getBody();
+          if (body == null) {
+            e.getIn().setBody(null);
+            return;
+          }
+          String json = body instanceof String s ? s : new String((byte[]) body);
+          if (json.isEmpty()) {
+            e.getIn().setBody(null);
+            return;
+          }
+          LoanApplication app = objectMapper.readValue(json, LoanApplication.class);
+          e.getIn().setBody(app);
+        });
   }
 
+  private void redisGetHeaders(Exchange exchange) {
+    String applicationId = exchange.getIn().getHeader("applicationId", String.class);
+    exchange.getIn().setHeader(RedisConstants.COMMAND, "GET");
+    exchange.getIn().setHeader(RedisConstants.KEY, CACHE_KEY_PREFIX + applicationId);
+  }
 }

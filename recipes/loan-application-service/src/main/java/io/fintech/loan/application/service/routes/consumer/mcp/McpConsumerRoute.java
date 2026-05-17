@@ -1,7 +1,8 @@
 package io.fintech.loan.application.service.routes.consumer.mcp;
 
 import io.fintech.loan.application.service.exception.GenericExceptionHandler;
-import io.fintech.loan.application.service.mapper.api.McpOrderMapper;
+import io.fintech.loan.application.service.mapper.api.McpLoanApplicationMapper;
+import io.fintech.loan.application.service.model.domain.LoanApplication;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,51 +10,51 @@ import org.apache.camel.builder.RouteBuilder;
 import org.camelbee.config.CamelBeeRouteConfigurer;
 import org.springframework.stereotype.Component;
 
-/**
- * Grpahql Listener Route.
- *
- * @author camelbee
- */
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("PMD.TooManyStaticImports")
 public class McpConsumerRoute extends RouteBuilder {
 
   final CamelBeeRouteConfigurer camelBeeRouteConfigurer;
   final GenericExceptionHandler genericExceptionHandler;
+  final McpLoanApplicationMapper mcpLoanApplicationMapper;
 
-  final McpOrderMapper mcpOrderMapper;
-
-  /**
-   * Configure.
-   *
-   * @throws Exception the exception
-   */
   @Override
   public void configure() throws Exception {
 
     camelBeeRouteConfigurer.configureRoute(this);
     errorHandler(genericExceptionHandler.appErrorHandler());
 
-    from("direct:mcpListOrders")
-        .routeId("mcpListOrdersRoute")
-        .to("direct:centralListOrders")
+    from("direct:mcpSubmitLoanApplication")
+        .routeId("mcpSubmitLoanApplicationRoute")
         .process(e -> {
-          e.getIn().setBody(mcpOrderMapper.domainToMcpOrders((List<io.fintech.loan.application.service.model.domain.Order>) e.getIn().getBody()));
+          var req = e.getIn().getBody(io.fintech.loan.application.service.model.api.mcp.LoanApplicationSubmissionRequest.class);
+          e.getIn().setBody(mcpLoanApplicationMapper.mcpRequestToDomain(req));
+        })
+        .to("direct:centralCreateOrder")
+        .process(e -> {
+          LoanApplication app = e.getIn().getBody(LoanApplication.class);
+          e.getIn().setBody(mcpLoanApplicationMapper.domainToMcpSubmissionResponse(app));
         });
 
-    from("direct:mcpCreateOrder")
-        .routeId("mcpCreateOrderRoute")
-        .convertBodyTo(io.fintech.loan.application.service.model.domain.Order.class)
-        .to("direct:centralCreateOrder")
-        .convertBodyTo(io.fintech.loan.application.service.model.api.mcp.Order.class);
-
-    from("direct:mcpGetOrder")
-        .routeId("mcpGetOrderRoute")
+    from("direct:mcpGetLoanApplicationStatus")
+        .routeId("mcpGetLoanApplicationStatusRoute")
         .to("direct:centralGetOrder")
-        .convertBodyTo(io.fintech.loan.application.service.model.api.mcp.Order.class);
+        .process(e -> {
+          LoanApplication app = e.getIn().getBody(LoanApplication.class);
+          e.getIn().setBody(mcpLoanApplicationMapper.domainToMcpLoanApplication(app));
+        });
 
+    from("direct:mcpListPendingApplications")
+        .routeId("mcpListPendingApplicationsRoute")
+        .to("direct:centralListOrders")
+        .process(e -> {
+          @SuppressWarnings("unchecked")
+          List<LoanApplication> apps = (List<LoanApplication>) e.getIn().getBody();
+          int page = e.getIn().getHeader("page", 0, Integer.class);
+          int pageSize = e.getIn().getHeader("pageSize", 10, Integer.class);
+          int totalItems = e.getIn().getHeader("totalItems", apps.size(), Integer.class);
+          e.getIn().setBody(mcpLoanApplicationMapper.toMcpPage(apps, totalItems, page, pageSize));
+        });
   }
-
 }

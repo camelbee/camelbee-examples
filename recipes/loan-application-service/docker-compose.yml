@@ -28,7 +28,7 @@ services:
 
       # Kafka
       KAFKA_URL: broker:29092
-      KAFKA_SCHEMA_REGISTRY_URL: http://schema-registry:8080/apis/registry/v2
+      KAFKA_SCHEMA_REGISTRY_URL: http://schema-registry:8081/apis/registry/v2
       JAVA_OPTS: >
         -XshowSettings:vm
         -XX:MetaspaceSize=512m

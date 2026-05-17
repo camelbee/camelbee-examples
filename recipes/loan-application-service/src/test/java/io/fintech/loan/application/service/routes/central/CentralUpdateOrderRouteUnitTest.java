@@ -2,111 +2,102 @@ package io.fintech.loan.application.service.routes.central;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.fintech.loan.application.service.model.domain.Order;
+import io.fintech.loan.application.service.model.domain.ApplicationStatus;
+import io.fintech.loan.application.service.model.domain.LoanApplication;
+import io.fintech.loan.application.service.model.infra.json.CreditAssessmentResult;
 import io.fintech.loan.application.service.routes.UnitTest;
-import io.fintech.loan.application.service.utils.testdata.RequestResponseScenario;
-import io.fintech.loan.application.service.utils.testdata.UpdateOrderDomainTestDataProducer;
-import io.fintech.loan.application.service.utils.testdata.UpdateOrderDomainTestDataProducer.RequestScenarios;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import io.fintech.loan.application.service.utils.TestDataFactory;
 import org.apache.camel.EndpointInject;
-import org.apache.camel.Exchange;
-import org.apache.camel.ValidationException;
 import org.apache.camel.builder.AdviceWith;
-import org.apache.camel.builder.ExchangeBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.camelbee.config.CamelBeeRouteConfigurer;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-/**
- * Unit Test for testing sunny and rainy day scenarios for the Ubuy Rest backend
- * in the Order Route.
- *
- * @author camelbee
- *
- */
-@SpringBootTest(classes = {
-    CentralUpdateOrderRoute.class,
-    CamelBeeRouteConfigurer.class
-})
+@DisplayName("CentralUpdateLoanApplicationRoute — three-path content-based routing")
 class CentralUpdateOrderRouteUnitTest extends UnitTest {
 
-  @EndpointInject(value = "mock:updateOrderRestEndpoint")
-  protected MockEndpoint mockUpdateOrderRestEndpoint;
-
-  @EndpointInject(value = "mock:updateOrderJpaEndpoint")
-  protected MockEndpoint mockUpdateOrderJpaEndpoint;
-
-  @EndpointInject(value = "mock:updateOrderKafkaEndpoint")
-  protected MockEndpoint mockUpdateOrderKafkaEndpoint;
-
-  @EndpointInject(value = "mock:updateOrderCacheEndpoint")
-  protected MockEndpoint mockUpdateOrderCacheEndpoint;
-
-  private final List<RequestResponseScenario> updateOrderScenarios = UpdateOrderDomainTestDataProducer.generateUpdateOrderRequests();
+  @EndpointInject("mock:bureau")
+  protected MockEndpoint mockBureau;
+  @EndpointInject("mock:updateJpa")
+  protected MockEndpoint mockJpa;
+  @EndpointInject("mock:updateCache")
+  protected MockEndpoint mockCache;
+  @EndpointInject("mock:updateKafka")
+  protected MockEndpoint mockKafka;
 
   @BeforeEach
-  public void setup() throws Exception {
-
-    AdviceWith.adviceWith(camelContext, "centralUpdateOrderRoute", a -> {
-      a.weaveById("updateOrderRestEndpoint").replace().to("mock:updateOrderRestEndpoint");
-      a.weaveById("updateOrderJpaEndpoint").replace().to("mock:updateOrderJpaEndpoint");
-      a.weaveById("updateOrderKafkaEndpoint").replace().to("mock:updateOrderKafkaEndpoint");
-      a.weaveById("updateOrderCacheEndpoint").replace().to("mock:updateOrderCacheEndpoint");
+  void setUp() throws Exception {
+    AdviceWith.adviceWith(camelContext, "centralUpdateLoanApplicationRoute", a -> {
+      a.weaveById("creditBureauAssessmentEndpoint").replace().process(e -> {
+        CreditAssessmentResult r = new CreditAssessmentResult();
+        r.setAssessmentId("MOCK-1");
+        r.setApproved(true);
+        r.setRiskScore(33);
+        r.setReason("Credit profile acceptable");
+        r.setRecommendedMaxAmount(java.math.BigDecimal.valueOf(50000));
+        e.setProperty("creditAssessmentResult", r);
+      }).to("mock:bureau");
+      a.weaveById("updateOrderJpaEndpoint").replace().to("mock:updateJpa");
+      a.weaveById("updateOrderCacheEndpoint").replace().to("mock:updateCache");
+      a.weaveById("updateOrderKafkaEndpoint").replace().to("mock:updateKafka");
     });
-
     camelContext.start();
   }
 
   @Test
-  @org.junit.jupiter.api.Order(1)
-  void given_InvalidOrder_When_UpdateOrderRouteCalled_And_ValidationFailed_Then_ResultIsValidationError() throws Exception {
+  @DisplayName("Path 1 (Auto-approve): low amount + high credit → no bureau call, APPROVED with risk=10")
+  void test_AutoApprove() throws Exception {
+    mockBureau.expectedMessageCount(0);
+    mockJpa.expectedMessageCount(1);
+    mockCache.expectedMessageCount(1);
+    mockKafka.expectedMessageCount(1);
 
-    // Verify mock expectations
-    MockEndpoint.expectsMessageCount(0);
+    var result = fluentProducerTemplate.to("direct:centralUpdateOrder")
+        .withBody(TestDataFactory.autoApproveInput()).send();
 
-    var result = callTestRoute(RequestScenarios.UPDATE_ORDER_ERROR_NO_ITEMS);
-
-    // Verify result
-    assertThat(result.getException()).isInstanceOf(ValidationException.class);
-
-    // Verify mock expectations
     MockEndpoint.assertIsSatisfied(camelContext);
-
+    LoanApplication response = result.getMessage().getBody(LoanApplication.class);
+    assertThat(response.getStatus()).isEqualTo(ApplicationStatus.APPROVED);
+    assertThat(response.getRiskScore()).isEqualTo(10);
+    assertThat(response.getDecisionReason()).isEqualTo("Auto-approved: low-risk application");
+    assertThat(response.getProcessedAt()).isNotNull();
   }
 
   @Test
-  @org.junit.jupiter.api.Order(2)
-  void given_ValidOrder_When_UpdateOrderRouteCalled_And_AllBackendsSuccessful_Then_ResultIsSuccess() throws Exception {
+  @DisplayName("Path 2 (Auto-reject): low credit → no bureau call, REJECTED with risk=95")
+  void test_AutoReject() throws Exception {
+    mockBureau.expectedMessageCount(0);
+    mockJpa.expectedMessageCount(1);
 
-    // Verify mock expectations
-    MockEndpoint.expectsMessageCount(1);
+    var result = fluentProducerTemplate.to("direct:centralUpdateOrder")
+        .withBody(TestDataFactory.autoRejectInput()).send();
 
-    var result = callTestRoute(RequestScenarios.UPDATE_ORDER_SUCCESS_ID_FORMAT.formatted(1));
-
-    // Verify mock expectations
     MockEndpoint.assertIsSatisfied(camelContext);
-
+    LoanApplication response = result.getMessage().getBody(LoanApplication.class);
+    assertThat(response.getStatus()).isEqualTo(ApplicationStatus.REJECTED);
+    assertThat(response.getRiskScore()).isEqualTo(95);
+    assertThat(response.getDecisionReason()).isEqualTo("Auto-rejected: credit score below minimum threshold");
   }
 
-  private Exchange callTestRoute(String scenarioName) throws Exception {
-    Map<String, Object> headers = new HashMap<>();
+  @Test
+  @DisplayName("Path 3 (Credit Bureau approved): bureau called → APPROVED with bureau riskScore")
+  void test_BureauApprovalPath() throws Exception {
+    mockBureau.expectedMessageCount(1);
+    mockJpa.expectedMessageCount(1);
 
-    // Create a valid Order object for testing
-    Order testOrder = getOrderByScenarioName(updateOrderScenarios, scenarioName);
+    var result = fluentProducerTemplate.to("direct:centralUpdateOrder")
+        .withBody(TestDataFactory.bureauApprovalInput()).send();
 
-    // Create an exchange with the necessary data
-    Exchange exchange = ExchangeBuilder.anExchange(camelContext).build();
-    exchange.getIn().setHeaders(headers);
-    exchange.getIn().setBody(testOrder);
-
-    return fluentProducerTemplate
-        .to("direct:centralUpdateOrder")
-        .withExchange(exchange)
-        .send();
+    MockEndpoint.assertIsSatisfied(camelContext);
+    LoanApplication response = result.getMessage().getBody(LoanApplication.class);
+    assertThat(response.getStatus()).isEqualTo(ApplicationStatus.APPROVED);
+    assertThat(response.getRiskScore()).isEqualTo(33);
+    assertThat(response.getDecisionReason()).isEqualTo("Credit profile acceptable");
   }
 
+  // Note: the credit-bureau "review" path (approved=false → PENDING_REVIEW)
+  // and the bureau-503 error path are covered by integration tests, which
+  // exercise the real WireMock stubs with creditScore < 650 and the
+  // X-Force-Bureau-Failure trigger respectively.
 }
