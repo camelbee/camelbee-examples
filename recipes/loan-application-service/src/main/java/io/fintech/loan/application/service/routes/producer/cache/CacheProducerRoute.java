@@ -65,18 +65,14 @@ public class CacheProducerRoute extends RouteBuilder {
         .process(this::redisGetHeaders)
         .to(REDIS_ENDPOINT)
         .process(e -> {
-          Object body = e.getIn().getBody();
-          if (body == null) {
+          // Coerce through Camel's type converter — Redis returns the value as a String
+          // wrapped in a stream cache, so a direct cast to byte[]/String would fail.
+          String json = e.getIn().getBody(String.class);
+          if (json == null || json.isEmpty()) {
             e.getIn().setBody(null);
             return;
           }
-          String json = body instanceof String s ? s : new String((byte[]) body);
-          if (json.isEmpty()) {
-            e.getIn().setBody(null);
-            return;
-          }
-          LoanApplication app = objectMapper.readValue(json, LoanApplication.class);
-          e.getIn().setBody(app);
+          e.getIn().setBody(objectMapper.readValue(json, LoanApplication.class));
         });
   }
 

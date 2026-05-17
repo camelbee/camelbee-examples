@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "camelbee": {
+      "command": "npx",
+      "args": ["mcp-remote", "https://www.camelbee.io/mcp",
+               "--header", "Authorization: Bearer cb_4a6c55039308459ca2bae74e6e5fe4e3"]
+    }
+  }
+}

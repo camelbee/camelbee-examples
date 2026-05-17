@@ -74,13 +74,20 @@ public class JpaProducerRoute extends RouteBuilder {
         .setProperty(Constants.ACTUAL_RESPONSE_BODY, body());
 
     // GET by applicationId — used by cache-aside GEO.
+    // singleResult=false so a missing row yields an empty list rather than throwing
+    // jakarta.persistence.NoResultException (which we'd then have to map to 404 separately).
     from("direct:getOrderJpa").routeId("getLoanApplicationJpaRoute")
         .process(this::setApplicationIdParam)
-        .to(JPA_ENTITY + "?namedQuery=LoanApplication.findByApplicationId&singleResult=true")
+        .to(JPA_ENTITY + "?namedQuery=LoanApplication.findByApplicationId")
         .process(e -> {
-          var entity = e.getIn().getBody(
-              io.fintech.loan.application.service.model.infra.jpa.postgresql.LoanApplication.class);
-          e.getIn().setBody(entity == null ? null : jpaMapper.jpaToDomain(entity));
+          @SuppressWarnings("unchecked")
+          List<io.fintech.loan.application.service.model.infra.jpa.postgresql.LoanApplication> rows = (List<io.fintech.loan.application.service.model.infra.jpa.postgresql.LoanApplication>) e
+              .getIn().getBody();
+          if (rows == null || rows.isEmpty()) {
+            e.getIn().setBody(null);
+          } else {
+            e.getIn().setBody(jpaMapper.jpaToDomain(rows.get(0)));
+          }
         });
 
     // LIST with optional status filter, paginated.
