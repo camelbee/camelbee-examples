@@ -1,0 +1,20 @@
+{
+  "priority": 4,
+  "request": {
+    "method": "PATCH",
+    "urlPathPattern": "/purchase-service-api/purchases/[0-9]+",
+    "headers": {
+      "Accept": {
+        "equalTo": "application/json"
+      }
+    }
+  },
+  "response": {
+    "status": 201,
+    "transformers": [],
+    "transformerParameters": {
+     "disableBodyFileTemplating": true
+    },
+    "bodyFileName": "rest/json/updatepurchase/updatepurchase-success-response.json"
+  }
+}

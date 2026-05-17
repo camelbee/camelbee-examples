@@ -1,0 +1,68 @@
+# Include the backend services
+include:
+  - path: ../../integration-test/resources/compose-backends.yml
+
+services:
+  # ... dockerized microservice
+  loan-application-service:
+    build:
+      context: ../../..
+      dockerfile: src/main/docker/Dockerfile.jvm
+    image: camelbee/loan-application-service
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+    environment:
+      # Spring Profile
+      SPRING_PROFILES_ACTIVE: prod
+      JDBC_POSTGRESQL_URL: jdbc:postgresql://postgresql:5432/CAMELBEE_DATABASE
+      CACHE_REDIS_HOST: cache
+      CACHE_REDIS_PORT: 6379
+      BACKEND_REST_URL: http://wiremock:8080
+
+      # Kafka
+      KAFKA_URL: broker:29092
+      KAFKA_SCHEMA_REGISTRY_URL: http://schema-registry:8080/apis/registry/v2
+      JAVA_OPTS: >
+        -XshowSettings:vm
+        -XX:MetaspaceSize=512m
+        -XX:MaxMetaspaceSize=1024m
+        -XX:InitialRAMPercentage=70
+        -XX:MaxRAMPercentage=70
+        -XX:MinRAMPercentage=70
+        -XX:+UseG1GC
+        -XX:MaxGCPauseMillis=200
+        -XX:+UseStringDeduplication
+        -Dcamel.threads.virtual.enabled=true
+    depends_on:
+      wiremock:
+        condition: service_started
+      postgresql:
+        condition: service_healthy
+      flyway-postgresql:
+        condition: service_completed_successfully
+      broker:
+        condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+      cache:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 4G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+
+networks:
+  default:
+    name: camelbee_default_network
+    driver: bridge

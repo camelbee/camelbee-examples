@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "camelbee": {
+      "type": "http",
+      "url": "https://www.camelbee.io/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_CAMELBEE_API_KEY"
+      }
+    }
+  }
+}

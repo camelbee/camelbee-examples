@@ -1,0 +1,136 @@
+[
+  {
+    "type": "record",
+    "name": "Orders",
+    "namespace": "io.fintech.loan.application.service.model.api.avro",
+    "doc": "A wrapper for a list of orders",
+    "fields": [
+      {
+        "name": "order",
+        "type": [
+          "null",
+          {
+            "type": "array",
+            "items": {
+              "type": "record",
+              "name": "Order",
+              "fields": [
+                {
+                  "name": "id",
+                  "type": [
+                    "null",
+                    "string"
+                  ],
+                  "default": null
+                },
+                {
+                  "name": "salesChannel",
+                  "type": [
+                    "null",
+                    "string"
+                  ],
+                  "default": null
+                },
+                {
+                  "name": "status",
+                  "type": [
+                    "null",
+                    "string"
+                  ],
+                  "default": null
+                },
+                {
+                  "name": "orderDate",
+                  "type": [
+                    "null",
+                    "int"
+                  ],
+                  "default": null
+                },
+                {
+                  "name": "lastUpdateTimestamp",
+                  "type": [
+                    "null",
+                    "long"
+                  ],
+                  "default": null
+                },
+                {
+                  "name": "items",
+                  "type": [
+                    "null",
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "record",
+                        "name": "OrderItem",
+                        "fields": [
+                          {
+                            "name": "id",
+                            "type": [
+                              "null",
+                              "string"
+                            ],
+                            "default": null
+                          },
+                          {
+                            "name": "productId",
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          {
+                            "name": "productName",
+                            "type": [
+                              "null",
+                              "string"
+                            ]
+                          },
+                          {
+                            "name": "quantity",
+                            "type": [
+                              "null",
+                              "int"
+                            ],
+                            "default": null
+                          },
+                          {
+                            "name": "price",
+                            "type": [
+                              "null",
+                              "double"
+                            ],
+                            "default": null
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "default": null
+                }
+              ]
+            }
+          }
+        ],
+        "default": null
+      }
+    ]
+  },
+  {
+    "type": "record",
+    "name": "Error",
+    "namespace": "io.fintech.loan.application.service.model.api.avro",
+    "doc": "Representation of an error",
+    "fields": [
+      {
+        "name": "code",
+        "type": "string"
+      },
+      {
+        "name": "message",
+        "type": "string"
+      }
+    ]
+  }
+]

@@ -1,0 +1,228 @@
+
+#
+# CamelBee Specific Configurations
+#
+camelbee:
+  # when enabled registers the CamelBee event notifier to the Camel context — required for tracer and logging to function
+  notifier-enabled: ${CAMELBEE_NOTIFIER_ENABLED:true}
+  # when enabled configures stream caching, MDC logging and CamelBeeUnitOfWork for routes
+  route-configurer-enabled: ${CAMELBEE_ROUTE_CONFIGURER_ENABLED:true}
+  # when enabled it allows the CamelBee UI to fetch the topology of the Camel Context (disable in production)
+  context-enabled: ${CAMELBEE_CONTEXT_ENABLED:true}
+  # when enabled intercepts/traces request and responses of all camel components and caches messages (disable in production)
+  tracer-enabled: ${CAMELBEE_TRACER_ENABLED:true}
+  # maximum time the tracer can remain idle before deactivation tracing of messages.
+  tracer-max-idle-time: ${CAMELBEE_TRACER_MAX_IDLE_TIME:60000}
+  # maximum collected trace messages
+  tracer-max-messages-count: ${CAMELBEE_TRACER_MAX_MESSAGES_COUNT:10000}
+  # when enabled it logs incoming and outgoing messages at external endpoint boundaries (interfaces and backends) with MDC correlation context — internal direct: routes are skipped; disable if you prefer your own logging
+  logging-enabled: ${CAMELBEE_LOGGING_ENABLED:true}
+
+server:
+  port: 8080
+
+
+#
+# Spring
+#
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: camelbeeservice
+  ai:
+    mcp:
+      server:
+        protocol: STREAMABLE
+
+
+  datasource:
+    sql:
+      init:
+        mode: always
+    # Hikari will use the above plus the following to setup connection pooling
+    hikari:
+      minimumIdle: 5
+      maximumPoolSize: 25
+      idleTimeout: 30000
+      poolName: SpringBootJPAHikariCP
+      maxLifetime: 2000000
+      connectionTimeout: 30000
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        useLocalSessionState: true
+        rewriteBatchedStatements: true
+        cacheResultSetMetadata: true
+        cacheServerConfiguration: true
+        elideSetAutoCommits: true
+        maintainTimeStats: false
+    generate-unique-name: true
+    url: ${JDBC_POSTGRESQL_URL:jdbc:postgresql://localhost:5432/CAMELBEE_DATABASE}
+    username: camelbee_user
+    password: secret
+    driver-class-name: org.postgresql.Driver
+
+# Spring Data JPA configuration
+  jpa:
+    enabled: true
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    packages: io.fintech.loan.application.service.model.api.jpa.postgresql,io.fintech.loan.application.service.model.infra.jpa.postgresql
+
+  # Spring Data configuration
+  data:
+    # Spring Data Redis — required for Spring Boot's Redis health indicator auto-configuration
+    # (Camel spring-redis component manages its own connection via URI params — this is for health check only)
+    redis:
+      host: ${CACHE_REDIS_HOST:localhost}
+      port: ${CACHE_REDIS_PORT:6379}
+
+# all access to actuator endpoints without security
+management:
+  server:
+    port: 8080
+  security:
+    enabled: false
+  # expose actuator endpoint via HTTP for info,health,camelroutes
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: /
+      path-mapping:
+        prometheus: metrics
+        metrics: metrics-default
+  # show verbose health details (/actuator/info) so you can see Camel information also
+  endpoint:
+    hystrix:
+      stream:
+        enabled: true
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  # allow to obtain basic information about Camel routes (read only mode)
+    camelroutes:
+      enabled: true
+      read-only: true
+  # Disable Spring Boot's auto-configured Redis health indicator — Camel spring-redis
+  # component manages its own connection; the auto-config uses Jedis which may timeout
+  # independently and incorrectly report the app as DOWN.
+  health:
+    redis:
+      enabled: false
+    
+# Logging
+logging:
+  level:
+    org.springframework.web: INFO
+    org.apache.camel: INFO
+
+# Camel
+#
+camel:
+  context:
+    name: loan-application-service
+  threads:
+    virtual:
+      enabled: true
+  springboot:
+    use-breadcrumb: true
+    use-m-d-c-logging: true
+    # The Camel context name
+    name: camelbeeservice
+
+  component:
+    servlet:
+      mapping:
+        context-path: /*
+    mapstruct:
+      mapper-package-name: io.fintech.loan.application.service.mapper
+    kafka:
+      brokers: ${KAFKA_URL:localhost:9092}
+      groupId: "camelbeeservice"
+      autoOffsetReset: "earliest"
+      # Apicurio Registry URL. Apicurio's serdes can also point at a Confluent
+      # Schema Registry by using its Confluent-compatibility endpoint
+      # (e.g. http://confluent-sr:8081/apis/ccompat/v6) and setting
+      # `apicurio.registry.use-id=contentId` plus the Legacy4ByteIdHandler.
+      additional-properties:
+        "[apicurio.registry.url]": ${KAFKA_SCHEMA_REGISTRY_URL:http://localhost:8081/apis/registry/v2}
+        "[apicurio.registry.auto-register]": "true"
+  # jackson properties
+  dataformat:
+    jackson:
+      object-mapper: jacksonObjectMapper
+      disable-features: FAIL_ON_EMPTY_BEANS
+      pretty-print: true
+      include: NON_NULL
+
+
+camelbeeservice:
+  cache:
+    vendor: AVRO-SCHEMAREGISTRY,POSTGRESQL,JSON,REDIS
+    host: ${CACHE_REDIS_HOST:localhost}
+    port: ${CACHE_REDIS_PORT:6379}
+
+  northbound-updateorder-topic: camelbeeservice-northbound-updateorder-topic
+  southbound-createorder-topic: camelbeeservice-southbound-createorder-topic
+  southbound-updateorder-topic: camelbeeservice-southbound-updateorder-topic
+
+backend-purchase-rest-api:
+  url: ${BACKEND_REST_URL:http://localhost:8091}/purchase-service-api/purchases
+  uri: /purchase-service-api/purchases
+
+    
+
+---
+# ============================================
+# TEST PROFILE
+# ============================================
+spring:
+  config:
+    activate:
+      on-profile: test
+
+logging:
+  level:
+    root: DEBUG
+    io.camelbee: DEBUG
+
+---
+# ============================================
+# INTEGRATION TEST PROFILE
+# ============================================
+spring:
+  config:
+    activate:
+      on-profile: itest
+
+
+logging:
+  level:
+    root: DEBUG
+    io.camelbee: DEBUG
+    org.apache.camel: DEBUG
+    org.sprinbootframework: DEBUG
+
+---
+# ============================================
+# PRODUCTION PROFILE
+# ============================================
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    root: WARN
+    io.camelbee: WARN

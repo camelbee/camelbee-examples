@@ -1,0 +1,6 @@
+camelbee:
+  notifier-enabled: false
+  route-configurer-enabled: false
+  context-enabled: false
+  tracer-enabled: false
+  logging-enabled: false

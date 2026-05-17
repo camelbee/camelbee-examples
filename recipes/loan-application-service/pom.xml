@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.camelbee</groupId>
+    <artifactId>camelbee-springboot-starter</artifactId>
+    <version>3.1.2</version>
+  </parent>
+
+  <artifactId>loan-application-service</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>loan-application-service</name>
+  <description>CamelBee camelbeeservice API</description>
+
+  <properties>
+    <!-- ... -->
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- move this to the camelbee springboot parent dependencies later! -->
+      <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-bom</artifactId>
+        <version>2.0.0-M2</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!--
+          Force json-schema-validator to version 2.0.0 to resolve conflict between:
+          - MCP SDK (client & server) which requires 2.0.0+ for the Dialects class
+          - WireMock 3.13.2 which declares 1.5.9 as a transitive dependency
+
+          Without this override, Maven may resolve to 1.5.9 (from WireMock) causing
+          NoClassDefFoundError for com/networknt/schema/dialect/Dialects when
+          initializing MCP client/server components.
+
+          WireMock 3.13.2 is compatible with 2.0.0 despite declaring 1.5.9.
+      -->
+      <dependency>
+        <groupId>com.networknt</groupId>
+        <artifactId>json-schema-validator</artifactId>
+        <version>2.0.0</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.apache.camel.springboot</groupId>
+      <artifactId>camel-mapstruct-starter</artifactId>
+    </dependency>
+
+          
+     
+    
+    <!-- jdbc component is needed to run the sql statements to reset test data-->
+    <dependency>
+      <groupId>org.apache.camel.springboot</groupId>
+      <artifactId>camel-jdbc-starter</artifactId>
+    </dependency>
+
+        <dependency>
+      <groupId>org.apache.camel.springboot</groupId>
+      <artifactId>camel-jpa-starter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+     
+     
+    
+        <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+    </dependency>
+    
+    
+    
+    
+    
+ 
+
+        <!-- Kafka -->
+    <dependency>
+      <groupId>org.apache.camel.springboot</groupId>
+      <artifactId>camel-kafka-starter</artifactId>
+    </dependency>
+        <!--
+        Apicurio Registry serdes for Avro / Protobuf / JSON Schema. Apicurio's
+        serdes can also speak Confluent's wire format via Legacy4ByteIdHandler,
+        so the generated microservice can talk to either an Apicurio Registry
+        or a Confluent Schema Registry in production with the same code.
+    -->
+        <dependency>
+      <groupId>io.apicurio</groupId>
+      <artifactId>apicurio-registry-serdes-avro-serde</artifactId>
+      <version>2.6.13.Final</version>
+    </dependency>
+                                                                                                      <!-- CACHE: AVRO-SCHEMAREGISTRY,POSTGRESQL,JSON,REDIS — Camel component brings transitive cache client dependencies -->
+        <dependency>
+      <groupId>org.apache.camel.springboot</groupId>
+      <artifactId>camel-spring-redis-starter</artifactId>
+    </dependency>
+         
+        <dependency>
+      <groupId>org.springframework.ai</groupId>
+      <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
+    </dependency>
+    
+        <dependency>
+      <groupId>org.apache.camel.springboot</groupId>
+      <artifactId>camel-platform-http-starter</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.camel.springboot</groupId>
+      <artifactId>camel-rest-openapi-starter</artifactId>
+    </dependency>
+    
+        <dependency>
+      <groupId>org.apache.camel.springboot</groupId>
+      <artifactId>camel-http-starter</artifactId>
+    </dependency>
+    
+        <dependency>
+      <groupId>io.swagger.core.v3</groupId>
+      <artifactId>swagger-annotations-jakarta</artifactId>
+    </dependency>
+    
+    
+     
+
+    <dependency>
+      <groupId>org.wiremock</groupId>
+      <artifactId>wiremock</artifactId>
+    </dependency>
+
+
+
+
+
+
+
+
+    <dependency>
+      <groupId>org.apache.camel.springboot</groupId>
+      <artifactId>camel-avro-starter</artifactId>
+    </dependency>
+
+
+
+    <dependency>
+      <groupId>net.logstash.logback</groupId>
+      <artifactId>logstash-logback-encoder</artifactId>
+    </dependency>
+
+
+  </dependencies>
+
+  <!-- BUILD: Define specific build plugins here -->
+  <build>
+
+
+    <plugins>
+            <!-- OpenApi Generator -->
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>${openapi-generator-maven-plugin.version}</version>
+        <executions>
+                    <!-- Microservice exposes REST api, we need to create camel restconfiguration via rest-openapi and model classes using the order-api.yaml  -->
+          <execution>
+            <id>generate-rest-sources-api</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.directory}/generated-sources/openapi</output>
+              <inputSpec>${project.basedir}/src/main/resources/openapi/order-api.yaml</inputSpec>
+              <generatorName>spring</generatorName>
+              <generateApis>false</generateApis>
+              <generateSupportingFiles>false</generateSupportingFiles>
+              <modelPackage>io.fintech.loan.application.service.model.api.json</modelPackage>
+              <configOptions>
+                <skipDefaultInterface>true</skipDefaultInterface>
+                <useBeanValidation>true</useBeanValidation>
+                <sourceFolder>src/main/java</sourceFolder>
+                <interfaceOnly>true</interfaceOnly>
+                <singleContentTypes>true</singleContentTypes>
+                <useTags>true</useTags>
+                <oas3>true</oas3>
+                <useSpringBoot3>true</useSpringBoot3>
+              </configOptions>
+            </configuration>
+          </execution>
+          
+                    <execution>
+            <id>generate-mcp-sources-api</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.directory}/generated-sources/openapi</output>
+              <inputSpec>${project.basedir}/src/main/resources/mcp/order-mcp-api.yaml</inputSpec>
+              <generatorName>spring</generatorName>
+              <generateApis>false</generateApis>
+              <generateSupportingFiles>false</generateSupportingFiles>
+              <modelPackage>io.fintech.loan.application.service.model.api.mcp</modelPackage>
+              <configOptions>
+                <skipDefaultInterface>true</skipDefaultInterface>
+                <useBeanValidation>true</useBeanValidation>
+                <sourceFolder>src/main/java</sourceFolder>
+                <interfaceOnly>true</interfaceOnly>
+                <singleContentTypes>true</singleContentTypes>
+                <useTags>true</useTags>
+                <oas3>true</oas3>
+                <useSpringBoot3>true</useSpringBoot3>
+              </configOptions>
+            </configuration>
+          </execution>
+          
+                    <!-- Microservice calls a backend REST api, we need to create model classes using the purchase-api.yaml  -->
+          <execution>
+            <id>generate-rest-sources-infra</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.directory}/generated-sources/openapi</output>
+              <inputSpec>${project.basedir}/src/main/resources/backends/openapi/purchase-api.yaml</inputSpec>
+              <generatorName>spring</generatorName>
+              <generateApis>false</generateApis>
+              <generateSupportingFiles>false</generateSupportingFiles>
+              <modelPackage>io.fintech.loan.application.service.model.infra.json</modelPackage>
+              <configOptions>
+                <skipDefaultInterface>true</skipDefaultInterface>
+                <useBeanValidation>true</useBeanValidation>
+                <sourceFolder>src/main/java</sourceFolder>
+                <interfaceOnly>true</interfaceOnly>
+                <singleContentTypes>true</singleContentTypes>
+                <useTags>true</useTags>
+                <oas3>true</oas3>
+                <useSpringBoot3>true</useSpringBoot3>
+              </configOptions>
+            </configuration>
+          </execution>
+                                      </executions>
+      </plugin>
+       
+
+ 
+         <!-- Avro Maven Plugin -->
+      <plugin>
+        <groupId>org.apache.avro</groupId>
+        <artifactId>avro-maven-plugin</artifactId>
+        <version>${avro-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>generate-avro-sources-api</id>
+            <goals>
+              <goal>schema</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <sourceDirectory>${project.basedir}/src/main/resources/avro</sourceDirectory>
+              <outputDirectory>${project.build.directory}/generated-sources/avro</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>generate-avro-sources-infra</id>
+            <goals>
+              <goal>schema</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <sourceDirectory>${project.basedir}/src/main/resources/backends/avro</sourceDirectory>
+              <outputDirectory>${project.build.directory}/generated-sources/avro</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+ 
+
+
+ 
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <layers>
+            <enabled>true</enabled>
+          </layers>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <!-- PROFILES: Define specific profiles here -->
+  <profiles>
+    <!-- ... -->
+  </profiles>
+
+  <!-- REPORTING: Define specific reporting plugins here -->
+  <reporting>
+    <!-- ... -->
+  </reporting>
+
+</project>

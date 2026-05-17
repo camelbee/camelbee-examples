@@ -1,0 +1,18 @@
+{
+  "id" : "",
+  "salesChannel" : "ONLINE",
+  "status" : "Pending",
+  "items" : [ {
+    "id" : "",
+    "productId" : "80-4",
+    "productName" : "Product80-4",
+    "quantity" : 1,
+    "price" : 10.2
+  }, {
+    "id" : "",
+    "productId" : "80-3",
+    "productName" : "Product80-3",
+    "quantity" : 2,
+    "price" : 15.3
+  } ]
+}

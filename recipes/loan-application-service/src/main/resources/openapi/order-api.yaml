@@ -1,0 +1,374 @@
+openapi: 3.0.1
+info:
+  title: Order Service API
+  description: API for managing orders and their items
+  version: 1.0.0
+servers:
+  - url: "{scheme}://{host}/{basePath}"
+    variables:
+      scheme:
+        enum:
+          - "https"
+          - "http"
+        default: "https"
+      host:
+        default: "camelbee.io"
+      basePath:
+        default: "/camelbee-service"
+paths:
+  /orders:
+    get:
+      summary: List all orders
+      operationId: listOrders
+      parameters:
+        - name: transactionId
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: requestId
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: salesChannel
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          description: Cursor token for NoSQL backends pagination. Pass the nextCursor value from a previous response to fetch the next page.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of orders
+          headers:
+            transactionId:
+              description: Transaction ID
+              schema:
+                type: string
+                format: uuid
+            requestId:
+              description: Request ID
+              schema:
+                type: string
+                format: uuid
+            currentPage:
+              description: The current page number
+              schema:
+                type: integer
+            totalPages:
+              description: The total number of pages available
+              schema:
+                type: integer
+            totalOrders:
+              description: The total number of items
+              schema:
+                type: integer
+            nextCursor:
+              description: Cursor token for fetching the next page of results (NoSQL backends). Absent or empty when there are no more pages.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request
+          headers:
+            transactionId:
+              description: Transaction ID
+              schema:
+                type: string
+                format: uuid
+            requestId:
+              description: Request ID
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          headers:
+            transactionId:
+              description: Transaction ID
+              schema:
+                type: string
+                format: uuid
+            requestId:
+              description: Request ID
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Create an order
+      operationId: createOrder
+      parameters:
+        - name: transactionId
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: requestId
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Order to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        '201':
+          description: Order created
+          headers:
+            transactionId:
+              description: Transaction ID
+              schema:
+                type: string
+                format: uuid
+            requestId:
+              description: Request ID
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request
+          headers:
+            transactionId:
+              description: Transaction ID
+              schema:
+                type: string
+                format: uuid
+            requestId:
+              description: Request ID
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          headers:
+            transactionId:
+              description: Transaction ID
+              schema:
+                type: string
+                format: uuid
+            requestId:
+              description: Request ID
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /orders/{id}:
+    get:
+      summary: Get an order by ID
+      operationId: getOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: salesChannel
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: transactionId
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: requestId
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        '200':
+          description: An order
+          headers:
+            transactionId:
+              description: Transaction ID
+              schema:
+                type: string
+                format: uuid
+            requestId:
+              description: Request ID
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request
+          headers:
+            transactionId:
+              description: Transaction ID
+              schema:
+                type: string
+                format: uuid
+            requestId:
+              description: Request ID
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Order not found
+          headers:
+            transactionId:
+              description: Transaction ID
+              schema:
+                type: string
+                format: uuid
+            requestId:
+              description: Request ID
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          headers:
+            transactionId:
+              description: Transaction ID
+              schema:
+                type: string
+                format: uuid
+            requestId:
+              description: Request ID
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Order:
+      type: object
+      required:
+        - salesChannel
+      properties:
+        id:
+          type: string
+        salesChannel:
+          type: string
+        status:
+          type: string
+          enum:
+            - Pending
+            - Confirmed
+            - Processing
+            - Shipped
+            - Delivered
+            - Completed
+            - Canceled
+            - Returned
+            - Failed
+            - On Hold
+          description: The status of an order
+        orderDate:
+          type: string
+          description:  Date format is ISO-8601 format (yyyy-MM-dd)
+          format: date
+        lastUpdateTimestamp:
+          type: string
+          description: Timestamp in ISO-8601 format (yyyy-MM-ddTHH:mm:ssZ)
+          format: date-time
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+
+    OrderItem:
+      type: object
+      required:
+        - productName
+      properties:
+        id:
+          type: string
+        productId:
+          type: string
+        productName:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: number
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+
+    Orders:
+      type: object
+      description: A wrapper for a list of orders
+      properties:
+        order:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+

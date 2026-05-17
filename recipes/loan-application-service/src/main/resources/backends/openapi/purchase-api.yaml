@@ -1,0 +1,175 @@
+openapi: 3.0.1
+info:
+  title: Purchase Service API
+  description: API for managing purchases and their items
+  version: 1.0.0
+paths:
+  /camelbee-service/purchases/{id}:
+    patch:
+      summary: Update an purchase by ID
+      operationId: updatePurchase
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: transactionId
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: requestId
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Purchase to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Purchase'
+      responses:
+        '200':
+          description: Purchase updated
+          headers:
+            transactionId:
+              description: Transaction ID
+              schema:
+                type: string
+                format: uuid
+            requestId:
+              description: Request ID
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Purchase'
+        '400':
+          description: Bad Request
+          headers:
+            transactionId:
+              description: Transaction ID
+              schema:
+                type: string
+                format: uuid
+            requestId:
+              description: Request ID
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Purchase not found
+          headers:
+            transactionId:
+              description: Transaction ID
+              schema:
+                type: string
+                format: uuid
+            requestId:
+              description: Request ID
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          headers:
+            transactionId:
+              description: Transaction ID
+              schema:
+                type: string
+                format: uuid
+            requestId:
+              description: Request ID
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Purchase:
+      type: object
+      required:
+        - salesChannel
+        - items
+      properties:
+        id:
+          type: string
+        salesChannel:
+          type: string
+        status:
+          type: string
+          enum:
+            - Pending
+            - Confirmed
+            - Processing
+            - Shipped
+            - Delivered
+            - Completed
+            - Canceled
+            - Returned
+            - Failed
+            - On Hold
+          description: The status of an purchase
+        purchaseDate:
+          type: string
+          description: Date format is ISO-8601 format (yyyy-MM-dd)
+          format: date
+        lastUpdateTimestamp:
+          type: string
+          description: Timestamp in ISO-8601 format (yyyy-MM-ddTHH:mm:ssZ)
+          format: date-time
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PurchaseItem'
+
+    PurchaseItem:
+      type: object
+      required:
+        - productName
+      properties:
+        id:
+          type: string
+        productId:
+          type: string
+        productName:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: number
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+
+    Purchases:
+      type: object
+      description: A wrapper for a list of purchases
+      properties:
+        purchase:
+          type: array
+          items:
+            $ref: '#/components/schemas/Purchase'
