@@ -1,0 +1,173 @@
+openapi: 3.0.1
+info:
+  title: Sensor Reading API
+  description: API for querying sensor readings
+  version: 1.0.0
+servers:
+  - url: "http://localhost:8080/camelbee-service"
+paths:
+  /sensor-readings:
+    get:
+      summary: List sensor readings
+      operationId: listSensorReadings
+      parameters:
+        - name: deviceId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+      responses:
+        '200':
+          description: A page of sensor readings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorReadingPage'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /sensor-readings/{readingId}:
+    get:
+      summary: Get a sensor reading by ID
+      operationId: getSensorReading
+      parameters:
+        - name: readingId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A sensor reading
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorReading'
+        '404':
+          description: Sensor reading not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    SensorReading:
+      type: object
+      required:
+        - readingId
+        - deviceId
+        - sensorType
+        - value
+        - unit
+        - quality
+        - recordedAt
+        - receivedAt
+      properties:
+        readingId:
+          type: string
+        deviceId:
+          type: string
+        sensorType:
+          type: string
+          enum:
+            - TEMPERATURE
+            - HUMIDITY
+            - PRESSURE
+            - CO2
+            - MOTION
+            - VIBRATION
+        value:
+          type: number
+          format: double
+        unit:
+          type: string
+        quality:
+          type: string
+          enum:
+            - GOOD
+            - UNCERTAIN
+            - BAD
+        location:
+          type: string
+          nullable: true
+        recordedAt:
+          type: string
+          format: date-time
+        receivedAt:
+          type: string
+          format: date-time
+    SensorReadingPage:
+      type: object
+      properties:
+        readings:
+          type: array
+          items:
+            $ref: '#/components/schemas/SensorReading'
+        totalItems:
+          type: integer
+          format: int64
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        deviceId:
+          type: string
+        from:
+          type: string
+        to:
+          type: string
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string

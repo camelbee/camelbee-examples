@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.camelbee</groupId>
+    <artifactId>camelbee-quarkus-starter</artifactId>
+    <version>3.2.1</version>
+  </parent>
+
+  <artifactId>sensor-ingestion</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>sensor-ingestion</name>
+  <description>CamelBee camelbeeservice API</description>
+
+  <properties>
+    <!-- ... -->
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- ... -->
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-mapstruct</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy-jackson</artifactId>
+    </dependency>
+
+          
+     
+     
+
+        <!-- Kafka -->
+    <dependency>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-kafka</artifactId>
+    </dependency>
+                            <!-- MQTT (Paho 5) -->
+    <dependency>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-paho-mqtt5</artifactId>
+    </dependency>
+                       <!-- MongoDB -->
+    <dependency>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-mongodb</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-mongodb-client</artifactId>
+    </dependency>
+                         
+
+        <dependency>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-platform-http</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-rest-openapi</artifactId>
+    </dependency>
+    
+        <dependency>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-http</artifactId>
+    </dependency>
+    
+    
+     
+
+
+
+    
+
+
+
+
+
+
+    
+
+
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-logging-json</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+
+
+    <!-- Required for native compilation of jms component -->
+    <dependency>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-reflect</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- Required for native compilation of jwt-->
+    <dependency>
+      <groupId>com.google.crypto.tink</groupId>
+      <artifactId>tink</artifactId>
+    </dependency>
+    <!-- Required for generating gRPC service classes that reference javax annotations -->
+
+
+
+  </dependencies>
+
+  <!-- BUILD: Define specific build plugins here -->
+  <build>
+
+
+    <plugins>
+            <!-- OpenApi Generator -->
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>${openapi-generator-maven-plugin.version}</version>
+        <executions>
+                    <!-- Microservice exposes REST api, we need to create camel restconfiguration via rest-openapi and model classes using the order-api.yaml  -->
+          <execution>
+            <id>generate-rest-sources-api</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <output>${project.build.directory}/generated-sources/openapi</output>
+              <inputSpec>${project.basedir}/src/main/resources/openapi/sensor-api.yaml</inputSpec>
+              <generatorName>jaxrs-spec</generatorName>
+              <generateApis>false</generateApis>
+              <modelPackage>io.iot.sensor.ingestion.model.api.json</modelPackage>
+              <configOptions>
+                <skipDefaultInterface>true</skipDefaultInterface>
+                <useBeanValidation>true</useBeanValidation>
+                <sourceFolder>src/main/java</sourceFolder>
+                <interfaceOnly>true</interfaceOnly>
+                <singleContentTypes>true</singleContentTypes>
+                <useTags>true</useTags>
+                <oas3>true</oas3>
+                <useSwaggerAnnotations>false</useSwaggerAnnotations>
+                <useJakartaEe>true</useJakartaEe>
+                <dateLibrary>java8</dateLibrary>
+              </configOptions>
+            </configuration>
+          </execution>
+          
+
+
+                  </executions>
+      </plugin>
+       
+
+ 
+ 
+
+
+ 
+
+    </plugins>
+  </build>
+
+  <!-- PROFILES: Define specific profiles here -->
+  <profiles>
+    <!-- ... -->
+  </profiles>
+
+  <!-- REPORTING: Define specific reporting plugins here -->
+  <reporting>
+    <!-- ... -->
+  </reporting>
+
+</project>

@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./mvnw:*)",
+      "Bash(mvn:*)",
+      "Bash(docker compose:*)",
+      "Bash(docker build:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker logs:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git status:*)",
+      "Bash(git branch:*)",
+      "Bash(curl:*)",
+      "Bash(grpcurl:*)",
+      "Bash(wscat:*)",
+      "Bash(diff:*)"
+    ],
+    "deny": [
+      "Bash(git push --force:*)"
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "_id": {"$oid": "671111111111111111111111"},
+    "readingId": "test-reading-001",
+    "deviceId": "device-001",
+    "sensorType": "TEMPERATURE",
+    "value": 23.5,
+    "unit": "C",
+    "quality": "GOOD",
+    "location": "room-1",
+    "recordedAt": "2025-01-01T00:00:00Z",
+    "receivedAt": "2025-01-01T00:00:01Z"
+  },
+  {
+    "_id": {"$oid": "671111111111111111111112"},
+    "readingId": "test-reading-002",
+    "deviceId": "device-001",
+    "sensorType": "HUMIDITY",
+    "value": 65.0,
+    "unit": "%",
+    "quality": "GOOD",
+    "location": "room-1",
+    "recordedAt": "2025-01-01T00:01:00Z",
+    "receivedAt": "2025-01-01T00:01:01Z"
+  },
+  {
+    "_id": {"$oid": "671111111111111111111113"},
+    "readingId": "test-reading-003",
+    "deviceId": "device-002",
+    "sensorType": "TEMPERATURE",
+    "value": 30.0,
+    "unit": "C",
+    "quality": "GOOD",
+    "location": "outdoor",
+    "recordedAt": "2025-01-01T00:00:00Z",
+    "receivedAt": "2025-01-01T00:00:02Z"
+  },
+  {
+    "_id": {"$oid": "671111111111111111111114"},
+    "readingId": "test-reading-004",
+    "deviceId": "device-001",
+    "sensorType": "CO2",
+    "value": 800.0,
+    "unit": "ppm",
+    "quality": "GOOD",
+    "location": null,
+    "recordedAt": "2025-01-01T00:02:00Z",
+    "receivedAt": "2025-01-01T00:02:01Z"
+  },
+  {
+    "_id": {"$oid": "671111111111111111111115"},
+    "readingId": "test-reading-005",
+    "deviceId": "device-003",
+    "sensorType": "PRESSURE",
+    "value": 1013.25,
+    "unit": "hPa",
+    "quality": "UNCERTAIN",
+    "location": "weather-station",
+    "recordedAt": "2025-01-01T00:00:00Z",
+    "receivedAt": "2025-01-01T00:00:03Z"
+  }
+]

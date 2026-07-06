@@ -1,0 +1,163 @@
+camelbee:
+  notifier-enabled: ${CAMELBEE_NOTIFIER_ENABLED:true}
+  route-configurer-enabled: ${CAMELBEE_ROUTE_CONFIGURER_ENABLED:true}
+  context-enabled: ${CAMELBEE_CONTEXT_ENABLED:true}
+  tracer-enabled: ${CAMELBEE_TRACER_ENABLED:true}
+  tracer-max-idle-time: ${CAMELBEE_TRACER_MAX_IDLE_TIME:60000}
+  tracer-max-messages-count: ${CAMELBEE_TRACER_MAX_MESSAGES_COUNT:10000}
+  logging-enabled: ${CAMELBEE_LOGGING_ENABLED:true}
+
+quarkus:
+  native:
+    resources:
+      includes:
+        - "openapi/**"
+  vertx:
+    event-loops-pool-size: 8
+    prefer-native-transport: true
+    worker-pool-size: 128
+  camel:
+    native:
+      reflection:
+        include-patterns: >
+          io.iot.sensor.ingestion.model.api.json.*,
+          io.iot.sensor.ingestion.model.infra.json.*,
+  devservices:
+    enabled: false
+  banner:
+    enabled: false
+  http:
+    port: 8080
+    accept-backlog: 4096
+    io-threads: 8
+    limits:
+      max-body-size: 10M
+      max-chunk-size: 8192
+      max-initial-line-length: 4096
+    idle-timeout: 30s
+    read-timeout: 60s
+    worker-threads: 200
+  test:
+    continuous-testing: "disabled"
+  smallrye-health:
+    root-path: /health
+  mongodb:
+    connection-string: ${MONGODB_URI:mongodb://root:example@localhost:27017/camelbee?authSource=admin}
+  index-dependency:
+    camelbeecore:
+      group-id: io.camelbee
+      artifact-id: camelbee-quarkus-core
+  jackson:
+    write-dates-as-timestamps: true
+    fail-on-unknown-properties: false
+    serialization-inclusion: non-null
+  micrometer:
+    export:
+      prometheus:
+        path: /metrics
+  log:
+    category:
+      "io.camelbee":
+        level: WARN
+      "org.apache.camel.component.http":
+        level: WARN
+      "org.apache.camel":
+        level: WARN
+      "io.quarkus.bootstrap.classloading":
+        level: WARN
+    level: WARN
+    console:
+      async: true
+      async-overflow: discard
+    json:
+      fields:
+        timestamp:
+          field-name: "@timestamp"
+        logger-name:
+          field-name: "logger_name"
+        mdc:
+          enabled: true
+          flat-fields: true
+        ndc:
+          enabled: false
+        thread-id:
+          enabled: false
+        hostname:
+          enabled: false
+        sequence:
+          enabled: false
+        process-name:
+          enabled: false
+        process-id:
+          enabled: false
+        logger-class-name:
+          enabled: false
+        thread-name:
+          enabled: false
+
+camel:
+  context:
+    name: sensor-ingestion
+  threads:
+    virtual:
+      enabled: true
+  component:
+    kafka:
+      brokers: ${KAFKA_URL:localhost:9092}
+      groupId: "sensor-ingestion"
+      autoOffsetReset: "earliest"
+    paho-mqtt5:
+      client-id: sensor-ingestion-client
+
+camelbeeservice:
+  mqtt:
+    broker-url: ${MQTT_URL:tcp://localhost:1883}
+  mongodb:
+    database: ${MONGODB_DATABASE:camelbee}
+    sensorreadings-collection: sensorReadings
+  southbound-ingest-topic: sensor-readings
+
+"%test":
+  quarkus:
+    artemis:
+      enabled: false
+      devservices:
+        enabled: false
+    datasource:
+      jdbc:
+        enabled: false
+      devservices:
+        enabled: false
+    hibernate-orm:
+      enabled: false
+      database:
+        generation: none
+    redis:
+      devservices:
+        enabled: false
+    kafka:
+      devservices:
+        enabled: false
+    mongodb:
+      devservices:
+        enabled: false
+    camel:
+      routes-discovery:
+        enabled: false
+    http:
+      test-port: 0
+    log:
+      level: DEBUG
+      json:
+        console:
+          enable: false
+
+"%itest":
+  quarkus:
+    http:
+      test-port: 0
+    log:
+      level: DEBUG
+      json:
+        console:
+          enable: false
